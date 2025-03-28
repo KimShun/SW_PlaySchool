@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:playschool/src/common/component/color.dart';
 import 'package:playschool/src/home.dart';
+import 'package:playschool/src/myPage/myPage.dart';
 
 void main() {
   runApp(const MyApp());
@@ -27,11 +28,15 @@ class _MyAppState extends State<MyApp> {
 }
 
 final GoRouter _router = GoRouter(
-  initialLocation: "/",
+  initialLocation: "/myPage",
   routes: [
     GoRoute(
       path: "/",
       builder: (context, state) => const HomeScreen(),
+    ),
+    GoRoute(
+      path: "/myPage",
+      builder: (context, state) => const MyPageScreen(),
     ),
   ]
 );
