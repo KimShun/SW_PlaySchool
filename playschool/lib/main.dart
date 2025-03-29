@@ -28,7 +28,7 @@ class _MyAppState extends State<MyApp> {
 }
 
 final GoRouter _router = GoRouter(
-  initialLocation: "/myPage",
+  initialLocation: "/",
   routes: [
     GoRoute(
       path: "/",
