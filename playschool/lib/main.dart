@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:playschool/src/common/component/color.dart';
 import 'package:playschool/src/home.dart';
 import 'package:playschool/src/myPage/myPage.dart';
+import 'package:playschool/src/puzzleGame/puzzle.dart';
 
 void main() {
   runApp(const MyApp());
@@ -28,7 +29,7 @@ class _MyAppState extends State<MyApp> {
 }
 
 final GoRouter _router = GoRouter(
-  initialLocation: "/",
+  initialLocation: "/puzzleGame",
   routes: [
     GoRoute(
       path: "/",
@@ -38,5 +39,9 @@ final GoRouter _router = GoRouter(
       path: "/myPage",
       builder: (context, state) => const MyPageScreen(),
     ),
+    GoRoute(
+      path: "/puzzleGame",
+      builder: (context, state) => const PuzzleGame(),
+    )
   ]
 );
