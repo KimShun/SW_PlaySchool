@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:playschool/src/common/component/color.dart';
 import 'package:playschool/src/home.dart';
 import 'package:playschool/src/myPage/myPage.dart';
+import 'package:playschool/src/puzzleGame/cubit/puzzleCubit.dart';
 import 'package:playschool/src/puzzleGame/puzzle.dart';
 
 void main() {
@@ -19,11 +21,16 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      theme: ThemeData(
-        scaffoldBackgroundColor: BG_COLOR
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (context) => PuzzleCubit())
+      ],
+      child: MaterialApp.router(
+        theme: ThemeData(
+          scaffoldBackgroundColor: BG_COLOR
+        ),
+        routerConfig: _router,
       ),
-      routerConfig: _router,
     );
   }
 }
