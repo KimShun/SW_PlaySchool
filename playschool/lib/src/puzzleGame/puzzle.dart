@@ -254,13 +254,6 @@ class PuzzleGame extends StatelessWidget {
                     ),
                   ),
                 ),
-                if (state.status == PuzzleStatus.completed)
-                  Stack(
-                    children: [
-                      Opacity(opacity: 0.1, child: Container(color: Colors.black),),
-                      Lottie.asset("assets/lottie/fireworks2.json"),
-                    ],
-                  )
               ],
             );
           }
@@ -274,83 +267,88 @@ class PuzzleGame extends StatelessWidget {
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16), // 모서리 둥글게
-          ),
-          backgroundColor: BG_COLOR,
-          content: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Lottie.asset("assets/lottie/celebrate_cat.json",
-                width: 150,
-                height: 150,
+        return Stack(
+          children: [
+            Lottie.asset("assets/lottie/fireworks2.json"),
+            AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16), // 모서리 둥글게
               ),
-              const SizedBox(height: 10),
-              Text("🎉 축하해~!! 🎉",
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 17,
-                  color: Y_TEXT_COLOR
-                ),
-              ),
-              Text("오늘의 게임 1단계를 통과했어!!",
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 17,
-                  color: Y_TEXT_COLOR
-                ),
-              ),
-              Text("🧩퍼즐 맞추기",
-                style: TextStyle(
-                  fontSize: 15.0,
-                  fontWeight: FontWeight.normal,
-                  color: TEXT_COLOR
-                ),
-              )
-            ],
-          ),
-          actions: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                TextButton(
-                  onPressed: () {
-                    context.read<PuzzleCubit>().loadImageUrl();
-                    Navigator.of(context).pop();
-                  },
-                  style: TextButton.styleFrom(
-                    foregroundColor: Colors.white,
-                    backgroundColor: Colors.blueAccent,
-                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+              backgroundColor: BG_COLOR,
+              content: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Lottie.asset("assets/lottie/celebrate_cat.json",
+                    width: 150,
+                    height: 150,
+                  ),
+                  const SizedBox(height: 10),
+                  Text("🎉 축하해~!! 🎉",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 17,
+                      color: Y_TEXT_COLOR
                     ),
                   ),
-                  child: const Text(
-                    "다시하기",
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
-                ),
-                const SizedBox(width: 10,),
-                TextButton(
-                  onPressed: () {
-                    context.read<PuzzleCubit>().puzzleDone();
-                    Navigator.of(context).pop();
-                  },
-                  style: TextButton.styleFrom(
-                    foregroundColor: Colors.white,
-                    backgroundColor: Colors.orangeAccent,
-                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+                  Text("오늘의 게임 1단계를 통과했어!!",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 17,
+                      color: Y_TEXT_COLOR
                     ),
                   ),
-                  child: const Text(
-                    "나가기",
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
+                  Text("🧩퍼즐 맞추기",
+                    style: TextStyle(
+                      fontSize: 15.0,
+                      fontWeight: FontWeight.normal,
+                      color: TEXT_COLOR
+                    ),
+                  )
+                ],
+              ),
+              actions: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    TextButton(
+                      onPressed: () {
+                        context.read<PuzzleCubit>().loadImageUrl();
+                        Navigator.of(context).pop();
+                      },
+                      style: TextButton.styleFrom(
+                        foregroundColor: Colors.white,
+                        backgroundColor: Colors.blueAccent,
+                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      child: const Text(
+                        "다시하기",
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                    const SizedBox(width: 10,),
+                    TextButton(
+                      onPressed: () {
+                        context.read<PuzzleCubit>().puzzleDone();
+                        Navigator.of(context).pop();
+                      },
+                      style: TextButton.styleFrom(
+                        foregroundColor: Colors.white,
+                        backgroundColor: Colors.orangeAccent,
+                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      child: const Text(
+                        "나가기",
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
