@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:audioplayers/audioplayers.dart';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
@@ -9,7 +10,10 @@ import 'dart:ui' as ui;
 
 class PuzzleCubit extends Cubit<PuzzleState> {
   final String imageUrl = "https://th.bing.com/th/id/OIP.W_jE3Gz7KaX_EeHEbW4FqwAAAA?rs=1&pid=ImgDetMain";
+  final AudioPlayer _player = AudioPlayer();
+
   PuzzleCubit() : super(PuzzleState()) {
+    playBGM();
     loadImageUrl();
   }
 
@@ -28,6 +32,15 @@ class PuzzleCubit extends Cubit<PuzzleState> {
     if(state.placedPieces!.values.every((pieces) => pieces == true)) {
       emit(state.copyWith(status: PuzzleStatus.completed));
     }
+  }
+
+  void playBGM() async {
+    await _player.setReleaseMode(ReleaseMode.loop);
+    await _player.play(AssetSource("bgm/puzzleBGM.mp3"));
+  }
+
+  void playPause() {
+    _player.dispose();
   }
 
   Future<void> loadImageUrl() async {
