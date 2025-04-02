@@ -96,15 +96,6 @@ class _detailHeader extends StatelessWidget {
                         ),
                       ],
                     ),
-                    GestureDetector(
-                      onTap: () {
-
-                      },
-                      child: Image.asset("assets/icon/exit.png",
-                        width: 40,
-                        height: 40,
-                      ),
-                    )
                   ],
                 ),
                 const SizedBox(height: 18),
@@ -122,6 +113,14 @@ class _detailHeader extends StatelessWidget {
                 ),
               ],
             ),
+          ),
+        ),
+        Positioned(
+          top: MediaQuery.of(context).size.width * 0.035,
+          right: MediaQuery.of(context).size.width * 0.035,
+          child: Image.asset("assets/icon/exit.png",
+            width: 40,
+            height: 40,
           ),
         ),
         Positioned(
