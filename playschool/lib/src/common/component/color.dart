@@ -30,3 +30,6 @@ Color MAKE_STROKE_COLOR = const Color(0xFF6CB1D0);
 Color MAKE_CARD_COLOR = const Color(0xFFBFF1FF);
 Color MAKE_BTN_COLOR = const Color(0xFF62D0D4);
 Color MAKE_MORE_COLOR = const Color(0xFFB1EEF0);
+
+Color SIGNUP_DROPDOWN_COLOR = const Color(0xFFDC67C7);
+Color SIGNUP_DROPDOWN2_COLOR = const Color(0xFF1490CA);
