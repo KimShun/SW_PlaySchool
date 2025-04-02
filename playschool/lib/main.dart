@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:playschool/src/common/component/color.dart';
+import 'package:playschool/src/common/detailGame/detailGame.dart';
 import 'package:playschool/src/home.dart';
 import 'package:playschool/src/myPage/myPage.dart';
 import 'package:playschool/src/puzzleGame/cubit/puzzleCubit.dart';
@@ -36,7 +37,7 @@ class _MyAppState extends State<MyApp> {
 }
 
 final GoRouter _router = GoRouter(
-  initialLocation: "/puzzleGame",
+  initialLocation: "/detailGame",
   routes: [
     GoRoute(
       path: "/",
@@ -49,6 +50,10 @@ final GoRouter _router = GoRouter(
     GoRoute(
       path: "/puzzleGame",
       builder: (context, state) => const PuzzleGame(),
+    ),
+    GoRoute(
+      path: "/detailGame",
+      builder: (context, state) => const DetailGameScreen(),
     )
   ]
 );

@@ -344,7 +344,7 @@ class PuzzleGame extends StatelessWidget {
                         ),
                       ),
                       child: const Text(
-                        "나가기",
+                        "확인",
                         style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                       ),
                     ),
