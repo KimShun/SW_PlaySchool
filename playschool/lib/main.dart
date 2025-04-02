@@ -38,7 +38,7 @@ class _MyAppState extends State<MyApp> {
 }
 
 final GoRouter _router = GoRouter(
-  initialLocation: "/signup",
+  initialLocation: "/detailGame",
   routes: [
     GoRoute(
       path: "/",
@@ -62,7 +62,7 @@ final GoRouter _router = GoRouter(
     ),
     GoRoute(
       path: "/detailGame",
-      builder: (context, state) => const DetailGameScreen(),
+      builder: (context, state) => DetailGameScreen(),
     )
   ]
 );
