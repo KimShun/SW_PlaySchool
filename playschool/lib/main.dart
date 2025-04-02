@@ -7,7 +7,8 @@ import 'package:playschool/src/home.dart';
 import 'package:playschool/src/myPage/myPage.dart';
 import 'package:playschool/src/puzzleGame/cubit/puzzleCubit.dart';
 import 'package:playschool/src/puzzleGame/puzzle.dart';
-
+import 'package:playschool/src/authentication/login.dart';
+import 'package:playschool/src/authentication/signup.dart';
 void main() {
   runApp(const MyApp());
 }
@@ -37,7 +38,7 @@ class _MyAppState extends State<MyApp> {
 }
 
 final GoRouter _router = GoRouter(
-  initialLocation: "/detailGame",
+  initialLocation: "/signup",
   routes: [
     GoRoute(
       path: "/",
@@ -50,6 +51,14 @@ final GoRouter _router = GoRouter(
     GoRoute(
       path: "/puzzleGame",
       builder: (context, state) => const PuzzleGame(),
+    ),
+    GoRoute(
+      path: "/login",
+      builder: (context, state) => const LoginScreen(),
+    ),
+    GoRoute(
+      path: "/signup",
+      builder: (context, state) => const SignupScreen(),
     ),
     GoRoute(
       path: "/detailGame",
