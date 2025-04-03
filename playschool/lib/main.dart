@@ -3,12 +3,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:playschool/src/common/component/color.dart';
 import 'package:playschool/src/common/detailGame/detailGame.dart';
+import 'package:playschool/src/common/detailGame/gameInfo.dart';
 import 'package:playschool/src/home.dart';
 import 'package:playschool/src/myPage/myPage.dart';
 import 'package:playschool/src/puzzleGame/cubit/puzzleCubit.dart';
 import 'package:playschool/src/puzzleGame/puzzle.dart';
 import 'package:playschool/src/authentication/login.dart';
 import 'package:playschool/src/authentication/signup.dart';
+
 void main() {
   runApp(const MyApp());
 }
@@ -38,19 +40,11 @@ class _MyAppState extends State<MyApp> {
 }
 
 final GoRouter _router = GoRouter(
-  initialLocation: "/detailGame",
+  initialLocation: "/",
   routes: [
     GoRoute(
       path: "/",
       builder: (context, state) => const HomeScreen(),
-    ),
-    GoRoute(
-      path: "/myPage",
-      builder: (context, state) => const MyPageScreen(),
-    ),
-    GoRoute(
-      path: "/puzzleGame",
-      builder: (context, state) => const PuzzleGame(),
     ),
     GoRoute(
       path: "/login",
@@ -61,8 +55,19 @@ final GoRouter _router = GoRouter(
       builder: (context, state) => const SignupScreen(),
     ),
     GoRoute(
+      path: "/myPage",
+      builder: (context, state) => const MyPageScreen(),
+    ),
+    GoRoute(
+      path: "/puzzleGame",
+      builder: (context, state) => const PuzzleGame(),
+    ),
+    GoRoute(
       path: "/detailGame",
-      builder: (context, state) => DetailGameScreen(),
+      builder: (context, state) {
+        final gameData = state.extra as GameData?;
+        return DetailGameScreen(gameData: gameData!);
+      },
     )
   ]
 );

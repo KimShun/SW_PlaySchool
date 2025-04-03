@@ -1,12 +1,21 @@
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:playschool/src/common/component/color.dart';
+import 'package:playschool/src/common/detailGame/gameInfo.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    bool hasSafeArea(BuildContext context) {
+      final padding = MediaQuery.of(context).padding;
+      return padding.top > 20;
+    }
+
+    bool needsSafeArea = hasSafeArea(context);
+
     return Scaffold(
       extendBody: true,
       body: Stack(
@@ -31,12 +40,15 @@ class HomeScreen extends StatelessWidget {
                         ),
                       ),
                       child: SafeArea(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            _mainHeaderTop(),
-                            _mainHeaderBottom()
-                          ],
+                        child: Padding(
+                          padding: EdgeInsets.only(top: 10.0, bottom: needsSafeArea ? 0 : 30),
+                          child: const Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              _mainHeaderTop(),
+                              _mainHeaderBottom(),
+                            ],
+                          ),
                         ),
                       ),
                     ),
@@ -119,12 +131,17 @@ class HomeScreen extends StatelessWidget {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          Row(
-                            children: [
-                              _gamePlayBtn("assets/icon/cardGame.jpg", "단어 맞추기", true),
-                              const SizedBox(width: 20),
-                              _gamePlayBtn("assets/icon/wrongPicture.jpg", "틀린그림찾기", true),
-                            ],
+                          SizedBox(
+                            height: 130,
+                            child: ListView.separated(
+                              scrollDirection: Axis.horizontal,
+                              physics: const ClampingScrollPhysics(),
+                              itemCount: playTypeList.length,
+                              separatorBuilder: (context, index) => const SizedBox(width: 20),
+                              itemBuilder: (context, index) {
+                                return _gamePlayBtn(context, playTypeList[index]);
+                              }
+                            ),
                           )
                         ],
                       ),
@@ -140,14 +157,17 @@ class HomeScreen extends StatelessWidget {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          Row(
-                            children: [
-                              _gamePlayBtn("assets/icon/dance.jpg", "율동 따라하기", true),
-                              const SizedBox(width: 20),
-                              _gamePlayBtn("assets/icon/drawPainting.webp", "그림 그리기", true),
-                              const SizedBox(width: 20),
-                              _gamePlayBtn("assets/icon/colorPaper.jpg", "색종이 접기", false),
-                            ],
+                          SizedBox(
+                            height: 130,
+                            child: ListView.separated(
+                              scrollDirection: Axis.horizontal,
+                              physics: const ClampingScrollPhysics(),
+                              itemCount: entTypeList.length,
+                              separatorBuilder: (context, index) => const SizedBox(width: 20),
+                              itemBuilder: (context, index) {
+                                return _gamePlayBtn(context, entTypeList[index]);
+                              }
+                            ),
                           )
                         ],
                       ),
@@ -163,12 +183,17 @@ class HomeScreen extends StatelessWidget {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          Row(
-                            children: [
-                              _gamePlayBtn("assets/icon/fairyTaleBook.jpg", "동화책 만들기", true),
-                              const SizedBox(width: 20),
-                              _gamePlayBtn("assets/icon/kidsSong.jpg", "동요 만들기", false),
-                            ],
+                          SizedBox(
+                            height: 130,
+                            child: ListView.separated(
+                              scrollDirection: Axis.horizontal,
+                              physics: const ClampingScrollPhysics(),
+                              itemCount: makeTypeList.length,
+                              separatorBuilder: (context, index) => const SizedBox(width: 20),
+                              itemBuilder: (context, index) {
+                                return _gamePlayBtn(context, makeTypeList[index]);
+                              }
+                            ),
                           )
                         ],
                       )
@@ -183,7 +208,7 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _gamePlayBtn(String iconPath, String titleName, bool available) {
+  Widget _gamePlayBtn(BuildContext context, GameData gameData) {
     return SizedBox(
       width: 90,
       height: 130,
@@ -201,15 +226,20 @@ class HomeScreen extends StatelessWidget {
           ),
           Stack(
             children: [
-              DottedBorder(
-                color: const Color(0xFF000000),
-                borderType: BorderType.Circle,
-                child: CircleAvatar(
-                  radius: 40,
-                  backgroundImage: AssetImage(iconPath)
+              GestureDetector(
+                onTap: () {
+                  context.push("/detailGame", extra: gameData);
+                },
+                child: DottedBorder(
+                  color: const Color(0xFF000000),
+                  borderType: BorderType.Circle,
+                  child: CircleAvatar(
+                    radius: 40,
+                    backgroundImage: AssetImage(gameData.gameIconPath)
+                  ),
                 ),
               ),
-              if(!available)
+              if(!gameData.isAvailable)
                 DottedBorder(
                   color: const Color(0xFF000000),
                   borderType: BorderType.Circle,
@@ -225,11 +255,11 @@ class HomeScreen extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 5),
-          Text(titleName,
+          Text(gameData.name,
             style: TextStyle(
-                color: TEXT_COLOR,
-                fontSize: 14.0,
-                fontWeight: FontWeight.w600
+              color: TEXT_COLOR,
+              fontSize: 14.0,
+              fontWeight: FontWeight.w600
             ),
           )
         ],
@@ -249,15 +279,20 @@ class _mainHeaderTop extends StatelessWidget {
         children: [
           Row(
             children: [
-              Container(
-                padding: const EdgeInsets.all(1),
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(color: Y_STROKE_COLOR, width:1),
-                ),
-                child: const CircleAvatar(
-                    radius: 33,
-                    backgroundImage: AssetImage("assets/icon/IMG_3332.jpg")
+              GestureDetector(
+                onTap: () {
+                  context.push("/myPage");
+                },
+                child: Container(
+                  padding: const EdgeInsets.all(1),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Y_STROKE_COLOR, width:1),
+                  ),
+                  child: const CircleAvatar(
+                      radius: 33,
+                      backgroundImage: AssetImage("assets/icon/IMG_3332.jpg")
+                  ),
                 ),
               ),
               const SizedBox(width: 10),

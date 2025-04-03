@@ -62,7 +62,7 @@ GameData colorPaper = GameData(
   detailImagePath: [],
   gameLevel: 1,
   difficultMsg: "연령에 상관없이 누구나 재미있게 즐길 수 있어요~!",
-  isAvailable: true,
+  isAvailable: false,
 );
 
 // 창작활동 게임
@@ -89,8 +89,12 @@ GameData makeKidSong = GameData(
   detailImagePath: [],
   gameLevel: 1,
   difficultMsg: "유치원 친구들부터 즐길 수 있는 게임이에요~!",
-  isAvailable: true
+  isAvailable: false
 );
+
+List<GameData> playTypeList = [wordCard, findWrongPicture];
+List<GameData> entTypeList = [followDance, drawPicture, colorPaper];
+List<GameData> makeTypeList = [makeFTBook, makeKidSong];
 
 enum GameType {
   play, // 놀이

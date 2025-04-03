@@ -4,8 +4,12 @@ import 'package:playschool/src/common/component/color.dart';
 import 'package:playschool/src/common/detailGame/gameInfo.dart';
 
 class DetailGameScreen extends StatelessWidget {
-  final GameData gameData = findWrongPicture;
-  DetailGameScreen({super.key});
+  final GameData gameData;
+
+  const DetailGameScreen({
+    super.key,
+    required this.gameData,
+  });
 
   @override
   Widget build(BuildContext context) {
