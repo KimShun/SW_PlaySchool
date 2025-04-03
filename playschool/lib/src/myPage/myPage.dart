@@ -48,6 +48,13 @@ class _MyPageHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    bool hasSafeArea(BuildContext context) {
+      final padding = MediaQuery.of(context).padding;
+      return padding.top > 20;
+    }
+
+    bool needsSafeArea = hasSafeArea(context);
+
     return Container(
       decoration: BoxDecoration(
         color: MYPAGE_HEADER_COLOR,
@@ -58,7 +65,7 @@ class _MyPageHeader extends StatelessWidget {
       ),
       child: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 26.0, vertical: 18.0),
+          padding: EdgeInsets.symmetric(horizontal: 26.0, vertical: needsSafeArea ? 0 : 18.0),
           child: Stack(
             children: [
               Image.asset("assets/icon/exit.png",

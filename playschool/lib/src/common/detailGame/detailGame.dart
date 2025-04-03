@@ -1,9 +1,15 @@
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:playschool/src/common/component/color.dart';
+import 'package:playschool/src/common/detailGame/gameInfo.dart';
 
 class DetailGameScreen extends StatelessWidget {
-  const DetailGameScreen({super.key});
+  final GameData gameData;
+
+  const DetailGameScreen({
+    super.key,
+    required this.gameData,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -22,15 +28,15 @@ class DetailGameScreen extends StatelessWidget {
                 padding: const EdgeInsets.all(15.0),
                 child: Column(
                   children: [
-                    _detailHeader(),
+                    _detailHeader(gameData: gameData),
                     const SizedBox(height: 15),
-                    _detailButtons(),
+                    _detailButtons(gameData: gameData),
                     const SizedBox(height: 15),
-                    _detailDescription(),
+                    _detailDescription(gameData: gameData),
                     const SizedBox(height: 15),
-                    _detailPreview(),
+                    _detailPreview(gameData: gameData),
                     const SizedBox(height: 15),
-                    _detailDifficult(),
+                    _detailDifficult(gameData: gameData),
                   ],
                 ),
               ),
@@ -43,7 +49,11 @@ class DetailGameScreen extends StatelessWidget {
 }
 
 class _detailHeader extends StatelessWidget {
-  const _detailHeader({super.key});
+  final GameData gameData;
+  const _detailHeader({
+    super.key,
+    required this.gameData
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -52,7 +62,9 @@ class _detailHeader extends StatelessWidget {
         Container(
           decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(30),
-              color: PLAY_HEADER_COLOR
+            color: gameData.gameType == GameType.play
+                ? PLAY_HEADER_COLOR : gameData.gameType == GameType.ent
+                ? EXERCISE_HEADER_COLOR : MAKE_HEADER_COLOR,
           ),
           child: Padding(
             padding: const EdgeInsets.all(15.0),
@@ -67,25 +79,32 @@ class _detailHeader extends StatelessWidget {
                           padding: const EdgeInsets.all(1),
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            border: Border.all(color: PLAY_STROKE_COLOR, width:1),
+                            border: Border.all(
+                              color: gameData.gameType == GameType.play
+                                  ? PLAY_STROKE_COLOR : gameData.gameType == GameType.ent
+                                  ? EXERCISE_STROKE_COLOR : MAKE_STROKE_COLOR,
+                              width:1
+                            ),
                           ),
-                          child: const CircleAvatar(
+                          child: CircleAvatar(
                             radius: 45,
-                            backgroundImage: AssetImage("assets/icon/wrongPicture.jpg"),
+                            backgroundImage: AssetImage(gameData.gameIconPath),
                           ),
                         ),
                         const SizedBox(width: 10),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text("틀린그림찾기",
+                            Text(gameData.name,
                               style: TextStyle(
-                                  color: Y_TEXT_COLOR,
+                                  color: gameData.gameType == GameType.play
+                                      ? Y_TEXT_COLOR : gameData.gameType == GameType.ent
+                                      ? EXERCISE_TEXT_COLOR : MAKE_TEXT_COLOR,
                                   fontWeight: FontWeight.bold,
                                   fontSize: 25.0
                               ),
                             ),
-                            Text("두 그림을 보고, 다른 부분을 찾아봐~!!",
+                            Text(gameData.shortDetail,
                               style: TextStyle(
                                   color: TEXT_COLOR,
                                   fontWeight: FontWeight.normal,
@@ -100,13 +119,17 @@ class _detailHeader extends StatelessWidget {
                 ),
                 const SizedBox(height: 18),
                 DottedBorder(
-                    color: PLAY_STROKE_COLOR,
+                    color: gameData.gameType == GameType.play
+                        ? PLAY_STROKE_COLOR : gameData.gameType == GameType.ent
+                        ? EXERCISE_STROKE_COLOR : MAKE_STROKE_COLOR,
                     borderType: BorderType.RRect,
                     radius: const Radius.circular(30),
                     child: Container(
                       height: 210,
                       decoration: BoxDecoration(
-                          color: PLAY_CARD_COLOR,
+                          color: gameData.gameType == GameType.play
+                              ? PLAY_CARD_COLOR : gameData.gameType == GameType.ent
+                              ? EXERCISE_CARD_COLOR : MAKE_CARD_COLOR,
                           borderRadius: BorderRadius.circular(30)
                       ),
                     )
@@ -140,7 +163,11 @@ class _detailHeader extends StatelessWidget {
 }
 
 class _detailButtons extends StatelessWidget {
-  const _detailButtons({super.key});
+  final GameData gameData;
+  const _detailButtons({
+    super.key,
+    required this.gameData,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -155,11 +182,18 @@ class _detailButtons extends StatelessWidget {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(15), // 모서리 둥글게
                       ),
-                      side: BorderSide(color: PLAY_STROKE_COLOR, width: 1),
-                      backgroundColor: PLAY_BTN_COLOR
+                      side: BorderSide(
+                        color: gameData.gameType == GameType.play
+                            ? PLAY_STROKE_COLOR : gameData.gameType == GameType.ent
+                            ? EXERCISE_STROKE_COLOR : MAKE_STROKE_COLOR,
+                        width: 1
+                      ),
+                      backgroundColor: gameData.gameType == GameType.play
+                        ? PLAY_BTN_COLOR : gameData.gameType == GameType.ent
+                        ? EXERCISE_BTN_COLOR : MAKE_BTN_COLOR,
                   ),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 15.0),
+                  child: const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 15.0),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -167,7 +201,7 @@ class _detailButtons extends StatelessWidget {
                           color: Colors.white,
                           size: 23,
                         ),
-                        const SizedBox(width: 5),
+                        SizedBox(width: 5),
                         Text("놀이하기",
                           style: TextStyle(
                               color: Colors.white,
@@ -184,15 +218,22 @@ class _detailButtons extends StatelessWidget {
             ElevatedButton(
                 onPressed: () {},
                 style: ElevatedButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15), // 모서리 둥글게
-                    ),
-                    side: BorderSide(color: PLAY_STROKE_COLOR, width: 1),
-                    backgroundColor: PLAY_MORE_COLOR
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15), // 모서리 둥글게
+                  ),
+                  side: BorderSide(
+                    color: gameData.gameType == GameType.play
+                        ? PLAY_STROKE_COLOR : gameData.gameType == GameType.ent
+                        ? EXERCISE_STROKE_COLOR : MAKE_STROKE_COLOR,
+                    width: 1
+                  ),
+                  backgroundColor: gameData.gameType == GameType.play
+                    ? PLAY_MORE_COLOR : gameData.gameType == GameType.ent
+                    ? EXERCISE_MORE_COLOR : MAKE_MORE_COLOR,
                 ),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 15.0),
-                  child: const Row(
+                child: const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 15.0),
+                  child: Row(
                     children: [
                       Icon(Icons.more_horiz,
                         color: Colors.white,
@@ -205,7 +246,7 @@ class _detailButtons extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 10),
-        Text("⚠️ 안전을 위해, 부모님의 조언과 지도가 필요할 수 있습니다.",
+        const Text("⚠️ 안전을 위해, 부모님의 조언과 지도가 필요할 수 있습니다.",
           style: TextStyle(
             fontSize: 11.0,
             fontWeight: FontWeight.bold,
@@ -218,7 +259,11 @@ class _detailButtons extends StatelessWidget {
 }
 
 class _detailDescription extends StatelessWidget {
-  const _detailDescription({super.key});
+  final GameData gameData;
+  const _detailDescription({
+    super.key,
+    required this.gameData
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -233,7 +278,9 @@ class _detailDescription extends StatelessWidget {
             const SizedBox(width: 15),
             Text("게임설명",
               style: TextStyle(
-                  color: Y_TEXT_COLOR,
+                  color: gameData.gameType == GameType.play
+                    ? Y_TEXT_COLOR : gameData.gameType == GameType.ent
+                    ? EXERCISE_TEXT_COLOR : MAKE_TEXT_COLOR,
                   fontSize: 25.0,
                   fontWeight: FontWeight.bold
               ),
@@ -241,7 +288,7 @@ class _detailDescription extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 10),
-        Text("'틀린그림찾기' 게임에 대해서 알려줄게~! \n위 아래 화면에 그림이 나타는데, 위에 화면을 보고 아래 화면에서 틀린 부분을 찾으면 되는 게임이야.",
+        Text(gameData.longDetail,
           style: TextStyle(
               color: TEXT_COLOR,
               fontWeight: FontWeight.bold
@@ -253,7 +300,11 @@ class _detailDescription extends StatelessWidget {
 }
 
 class _detailPreview extends StatelessWidget {
-  const _detailPreview({super.key});
+  final GameData gameData;
+  const _detailPreview({
+    super.key,
+    required this.gameData,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -268,7 +319,9 @@ class _detailPreview extends StatelessWidget {
             const SizedBox(width: 15),
             Text("미리보기",
               style: TextStyle(
-                  color: Y_TEXT_COLOR,
+                  color: gameData.gameType == GameType.play
+                    ? Y_TEXT_COLOR : gameData.gameType == GameType.ent
+                    ? EXERCISE_TEXT_COLOR : MAKE_TEXT_COLOR,
                   fontSize: 25.0,
                   fontWeight: FontWeight.bold
               ),
@@ -280,15 +333,22 @@ class _detailPreview extends StatelessWidget {
           height: 150,
           child: ListView.separated(
               scrollDirection: Axis.horizontal,
-              physics: ClampingScrollPhysics(),
+              physics: const ClampingScrollPhysics(),
               itemCount: 4,
               separatorBuilder: (context, index) => const SizedBox(width: 10),
               itemBuilder: (context, index) {
                 return Container(
                   width: 110,
                   decoration: BoxDecoration(
-                      color: PLAY_CARD_COLOR,
-                      border: Border.all(color: PLAY_STROKE_COLOR, width: 1),
+                      color: gameData.gameType == GameType.play
+                        ? PLAY_CARD_COLOR : gameData.gameType == GameType.ent
+                        ? EXERCISE_CARD_COLOR : MAKE_CARD_COLOR,
+                      border: Border.all(
+                        color: gameData.gameType == GameType.play
+                          ? PLAY_STROKE_COLOR : gameData.gameType == GameType.ent
+                          ? EXERCISE_STROKE_COLOR : MAKE_STROKE_COLOR,
+                        width: 1
+                      ),
                       borderRadius: BorderRadius.circular(20)
                   ),
                 );
@@ -301,7 +361,11 @@ class _detailPreview extends StatelessWidget {
 }
 
 class _detailDifficult extends StatelessWidget {
-  const _detailDifficult({super.key});
+  final GameData gameData;
+  const _detailDifficult({
+    super.key,
+    required this.gameData,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -317,9 +381,11 @@ class _detailDifficult extends StatelessWidget {
             const SizedBox(width: 15),
             Text("게임 난이도",
               style: TextStyle(
-                  color: Y_TEXT_COLOR,
-                  fontSize: 25.0,
-                  fontWeight: FontWeight.bold
+                color: gameData.gameType == GameType.play
+                  ? Y_TEXT_COLOR : gameData.gameType == GameType.ent
+                  ? EXERCISE_TEXT_COLOR : MAKE_TEXT_COLOR,
+                fontSize: 25.0,
+                fontWeight: FontWeight.bold
               ),
             )
           ],
@@ -327,14 +393,14 @@ class _detailDifficult extends StatelessWidget {
         const SizedBox(height: 5),
         Row(
           children: [
-            ...List.generate(1, (index) =>
+            ...List.generate(gameData.gameLevel, (index) =>
                 Padding(
                   padding: const EdgeInsets.only(right: 8),
                   child: Image.asset("assets/icon/favourite (1).png",
                     width: 45, height: 45,
                   ),
                 )),
-            ...List.generate(5-1, (index) =>
+            ...List.generate(5-gameData.gameLevel, (index) =>
                 Padding(
                   padding: const EdgeInsets.only(right: 8),
                   child: Image.asset("assets/icon/favourite.png",
@@ -346,7 +412,9 @@ class _detailDifficult extends StatelessWidget {
         const SizedBox(height: 10),
         Text("연령에 관계없이 누구나 재미있게 즐길 수 있어요!!",
           style: TextStyle(
-              color: PLAY_STROKE_COLOR,
+              color: gameData.gameType == GameType.play
+                ? PLAY_STROKE_COLOR : gameData.gameType == GameType.ent
+                ? EXERCISE_STROKE_COLOR : MAKE_STROKE_COLOR,
               fontSize: 13.0,
               fontWeight: FontWeight.bold
           ),
