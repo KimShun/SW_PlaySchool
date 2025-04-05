@@ -6,187 +6,186 @@ class LoginScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.of(context).size.width;
+
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
         extendBody: true,
         body: Stack(
           children: [
-            // 배경 이미지
-            Opacity(
-              opacity: 0.3,
-              child: Image.asset("assets/background/login_bg.png"),
-            ),
 
-            // 로고 이미지
-            Positioned(
-              top: 20,
-              left: 0,
-              right: 0,
-              child: Image.asset(
-                "assets/icon/logo.png",
-                height: 400,
-              ),
-            ),
-
-            // 마법사 아이콘
-            Positioned(
-              left: MediaQuery.of(context).size.width * 0.12,
-              top: MediaQuery.of(context).size.width * 0.81,
-              child: Transform.rotate(
-                angle: -10 * 3.1415927 / 180,
+            Positioned.fill(
+              child: Opacity(
+                opacity: 0.3,
                 child: Image.asset(
-                  "assets/icon/wizard.png",
-                  width: 60,
-                  height: 60,
+                  "assets/background/login_bg.png",
+                  fit: BoxFit.cover,
                 ),
               ),
             ),
 
-            // 입력 필드 + 버튼 영역
-            Positioned(
-              top: 380,
-              left: 20,
-              right: 20,
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 20.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+            /// 전체 내용
+            SingleChildScrollView(
+              child: SizedBox(
+                height: screenHeight,
+                child: Stack(
                   children: [
-                    // 아이디 입력칸
-                    TextField(
-                      decoration: InputDecoration(
-                        prefixIcon: Icon(Icons.account_circle_rounded),
-                        suffixIcon: Icon(Icons.close),
-                        fillColor: Colors.white,
-                        filled: true,
-                        labelStyle: TextStyle(color: Colors.grey[500]),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(30.0),
-                          borderSide: BorderSide(color: Colors.grey),
+                    /// 로고
+                    Positioned(
+                      top: screenHeight * 0.02,
+                      left: 0,
+                      right: 0,
+                      child: Center(
+                        child: Image.asset(
+                          "assets/icon/logo.png",
+                          height: screenHeight * 0.45,
                         ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(30.0),
-                          borderSide: BorderSide(color: Colors.grey),
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(30.0),
-                          borderSide: BorderSide(color: Colors.grey),
-                        ),
-                        labelText: 'ID',
-                      ),
-                    ),
-                    SizedBox(height: 30),
-
-                    // 패스워드 입력칸
-                    TextField(
-                      obscureText: true,
-                      decoration: InputDecoration(
-                        prefixIcon: Icon(Icons.lock),
-                        suffixIcon: Icon(Icons.visibility_off),
-                        fillColor: Colors.white,
-                        filled: true,
-                        labelStyle: TextStyle(color: Colors.grey[500]),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(30.0),
-                          borderSide: BorderSide(color: Colors.grey),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(30.0),
-                          borderSide: BorderSide(color: Colors.grey),
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(30.0),
-                          borderSide: BorderSide(color: Colors.grey),
-                        ),
-                        labelText: 'PASSWORD',
                       ),
                     ),
 
-                    SizedBox(height: 10),
+                    ///마법사 + 입력 필드 + 버튼 묶음
+                    Positioned(
+                      top: screenHeight * 0.3,
+                      left: 0,
+                      right: 0,
+                      child: Column(
+                        children: [
+                          /// 마법사 아이콘
+                          Stack(
+                            clipBehavior: Clip.none,
+                            children: [
+                              Positioned(
+                                top: 55,
+                                left: 20,
+                                child: Transform.rotate(
+                                  angle: -10 * 3.1415927 / 180,
+                                  child: Image.asset(
+                                    "assets/icon/wizard.png",
+                                    width: screenWidth * 0.18,
+                                  ),
+                                ),
+                              ),
 
-                    // 회원가입 & 비밀번호 찾기
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        GestureDetector(
-                          onTap: () {
-                            context.go('/signup');
-                          },
-                          child: Text(
-                            "회원가입",
-                            style: TextStyle(
-                              color: Colors.black87,
-                              fontSize: 15,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                        Text(" | ", style: TextStyle(
-                          color: Colors.black87,
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold,)),
-                        GestureDetector(
-                          onTap: () {
-                            print("비밀번호 찾기 클릭");
-                          },
-                          child: Text(
-                            "비밀번호 찾기",
-                            style: TextStyle(
-                              color: Colors.black87,
-                              fontSize: 15,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
 
-                    SizedBox(height: 70),
+                              /// 입력 필드 묶음
+                              Padding(
+                                padding: const EdgeInsets.only(top: 120.0),
+                                child: Column(
+                                  children: [
+                                    /// ID
+                                    FractionallySizedBox(
+                                      widthFactor: 0.85,
+                                      child: TextField(
+                                        decoration: InputDecoration(
+                                          prefixIcon:
+                                          Icon(Icons.account_circle),
+                                          filled: true,
+                                          fillColor: Colors.white,
+                                          labelText: 'ID',
+                                          border: OutlineInputBorder(
+                                            borderRadius:
+                                            BorderRadius.circular(30),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(height: 20),
 
-                    // 로그인 버튼
-                    GestureDetector(
-                      onTap: () {
-                        context.go('/');
-                      },
-                      child: Container(
-                        height: 55,
-                        width: 320,
-                        padding: EdgeInsets.symmetric(vertical: 7.0, horizontal: 20.0),
-                        decoration: BoxDecoration(
-                          color: Color(0xFFB386FF),
-                          borderRadius: BorderRadius.circular(20.0),
-                        ),
-                        child: Center(
-                          child: Text(
-                            "로그인",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 30,
-                              fontWeight: FontWeight.bold,
-                            ),
+                                    /// Password
+                                    FractionallySizedBox(
+                                      widthFactor: 0.85,
+                                      child: TextField(
+                                        obscureText: true,
+                                        decoration: InputDecoration(
+                                          prefixIcon: Icon(Icons.lock),
+                                          filled: true,
+                                          fillColor: Colors.white,
+                                          labelText: 'PASSWORD',
+                                          border: OutlineInputBorder(
+                                            borderRadius:
+                                            BorderRadius.circular(30),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(height: 15),
+
+                                    /// 회원가입 / 비밀번호 찾기
+                                    FractionallySizedBox(
+                                      widthFactor: 0.85,
+                                      child: Row(
+                                        mainAxisAlignment:
+                                        MainAxisAlignment.end,
+                                        children: [
+                                          GestureDetector(
+                                            onTap: () => context.go('/signup'),
+                                            child: Text("회원가입",
+                                                style: TextStyle(
+                                                    fontWeight:
+                                                    FontWeight.bold)),
+                                          ),
+                                          Text(" | "),
+                                          GestureDetector(
+                                            onTap: () {
+                                              print("비밀번호 찾기 클릭");
+                                            },
+                                            child: Text("비밀번호 찾기",
+                                                style: TextStyle(
+                                                    fontWeight:
+                                                    FontWeight.bold)),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    SizedBox(height: 80),
+
+                                    /// 로그인 버튼
+                                    GestureDetector(
+                                      onTap: () => context.go('/'),
+                                      child: FractionallySizedBox(
+                                        widthFactor: 0.85,
+                                        child: Container(
+                                          height: 55,
+                                          decoration: BoxDecoration(
+                                            color: Color(0xFFB386FF),
+                                            borderRadius:
+                                            BorderRadius.circular(20.0),
+                                          ),
+                                          child: Center(
+                                            child: Text(
+                                              "로그인",
+                                              style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 20,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Positioned(
+                                top: 310,
+                                right: 20,
+                                child: Transform.rotate(
+                                  angle: -10 * 3.1415927 / 180,
+                                  child: Image.asset(
+                                    "assets/icon/fairy.png",
+                                    width: screenWidth * 0.18,
+                                  ),
+                                ),
+                              ),
+
+                            ],
                           ),
-                        ),
+                        ],
                       ),
                     ),
                   ],
-                ),
-              ),
-            ),
-
-            // 요정 아이콘
-            Positioned(
-              right: MediaQuery.of(context).size.width * 0.08,  // 오른쪽 여백 조정
-              bottom: MediaQuery.of(context).size.width * 0.45, // 하단 위치 조정
-              child: Transform.translate(
-                offset: Offset(0, -25),
-                child: Transform.rotate(
-                  angle: -10 * 3.1415927 / 180,
-                  child: Image.asset(
-                    "assets/icon/fairy.png",
-                    width: 60,
-                    height: 60,
-                  ),
                 ),
               ),
             ),
