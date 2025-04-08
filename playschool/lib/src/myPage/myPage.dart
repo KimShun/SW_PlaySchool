@@ -68,9 +68,14 @@ class _MyPageHeader extends StatelessWidget {
           padding: EdgeInsets.symmetric(horizontal: 26.0, vertical: needsSafeArea ? 0 : 18.0),
           child: Stack(
             children: [
-              Image.asset("assets/icon/exit.png",
-                width: 40,
-                height: 40,
+              GestureDetector(
+                onTap: () {
+                  Navigator.of(context).pop();
+                },
+                child: Image.asset("assets/icon/exit.png",
+                  width: 40,
+                  height: 40,
+                ),
               ),
               Center(
                 child: Image.asset("assets/icon/kitty.png",
