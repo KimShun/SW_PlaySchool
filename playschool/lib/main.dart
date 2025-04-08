@@ -4,13 +4,14 @@ import 'package:go_router/go_router.dart';
 import 'package:playschool/src/common/component/color.dart';
 import 'package:playschool/src/common/detailGame/detailGame.dart';
 import 'package:playschool/src/common/detailGame/gameInfo.dart';
+import 'package:playschool/src/games/drawing/drawingGame.dart';
+import 'package:playschool/src/games/fairyTale/makeFairyTale.dart';
+import 'package:playschool/src/games/puzzleGame/cubit/puzzleCubit.dart';
+import 'package:playschool/src/games/puzzleGame/puzzle.dart';
 import 'package:playschool/src/home.dart';
 import 'package:playschool/src/myPage/myPage.dart';
-import 'package:playschool/src/puzzleGame/cubit/puzzleCubit.dart';
-import 'package:playschool/src/puzzleGame/puzzle.dart';
 import 'package:playschool/src/authentication/login.dart';
 import 'package:playschool/src/authentication/signup.dart';
-import 'package:playschool/src/common/detailGame/games/drawingGame.dart';
 
 void main() {
   runApp(const MyApp());
@@ -73,6 +74,13 @@ final GoRouter _router = GoRouter(
     GoRoute(
       path: "/drawingGame",
       builder: (context, state) => const DrawingGameScreen(),
+    ),
+    GoRoute(
+      path: "/makeFairyTaleBook",
+      builder: (context, state) {
+        final gameData = state.extra as GameData?;
+        return MakeFairyTaleScreen(gameData: gameData!);
+      },
     ),
   ]
 );
