@@ -2,6 +2,7 @@ import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:playschool/src/common/component/color.dart';
 import 'package:playschool/src/common/detailGame/gameInfo.dart';
+import 'package:go_router/go_router.dart';
 
 class DetailGameScreen extends StatelessWidget {
   final GameData gameData;
@@ -177,42 +178,57 @@ class _detailButtons extends StatelessWidget {
           children: [
             Expanded(
               child: ElevatedButton(
-                  onPressed: () {},
-                  style: ElevatedButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15), // 모서리 둥글게
-                      ),
-                      side: BorderSide(
-                        color: gameData.gameType == GameType.play
-                            ? PLAY_STROKE_COLOR : gameData.gameType == GameType.ent
-                            ? EXERCISE_STROKE_COLOR : MAKE_STROKE_COLOR,
-                        width: 1
-                      ),
-                      backgroundColor: gameData.gameType == GameType.play
-                        ? PLAY_BTN_COLOR : gameData.gameType == GameType.ent
-                        ? EXERCISE_BTN_COLOR : MAKE_BTN_COLOR,
+                onPressed: () {
+                  final Map<String, String> gameRouteMap = {
+                    "그림 그리기": "/drawingGame",
+                    "단어 맞추기": "",
+                    "틀린그림찾기": "",
+                    "율동 따라하기": "",
+                    "동화책 만들기": "",
+                  };
+
+                  final route = gameRouteMap[gameData.name];
+                  if (route != null) {
+                    context.go(route);
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text("이 게임은 아직 준비 중이에요!")),
+                    );
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15),
                   ),
-                  child: const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 15.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.play_arrow,
-                          color: Colors.white,
-                          size: 23,
+                  side: BorderSide(
+                      color: gameData.gameType == GameType.play
+                          ? PLAY_STROKE_COLOR : gameData.gameType == GameType.ent
+                          ? EXERCISE_STROKE_COLOR : MAKE_STROKE_COLOR,
+                      width: 1
+                  ),
+                  backgroundColor: gameData.gameType == GameType.play
+                      ? PLAY_BTN_COLOR : gameData.gameType == GameType.ent
+                      ? EXERCISE_BTN_COLOR : MAKE_BTN_COLOR,
+                ),
+                child: const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 15.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.play_arrow, color: Colors.white, size: 23),
+                      SizedBox(width: 5),
+                      Text("놀이하기",
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16.0
                         ),
-                        SizedBox(width: 5),
-                        Text("놀이하기",
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16.0
-                          ),
-                        ),
-                      ],
-                    ),
-                  )
+                      ),
+                    ],
+                  ),
+                ),
               ),
+
             ),
             const SizedBox(width: 10),
             ElevatedButton(
