@@ -14,6 +14,13 @@ class DetailGameScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    bool hasSafeArea(BuildContext context) {
+      final padding = MediaQuery.of(context).padding;
+      return padding.top > 20;
+    }
+
+    bool needsSafeArea = hasSafeArea(context);
+
     return Scaffold(
       extendBody: true,
       body: Stack(
@@ -25,7 +32,7 @@ class DetailGameScreen extends StatelessWidget {
           SingleChildScrollView(
             scrollDirection: Axis.vertical,
             child: Padding(
-              padding: const EdgeInsets.all(15.0),
+              padding: EdgeInsets.symmetric(horizontal: 15.0, vertical: needsSafeArea ? 0 : 15.0),
               child: Column(
                 children: [
                   _detailHeader(gameData: gameData),

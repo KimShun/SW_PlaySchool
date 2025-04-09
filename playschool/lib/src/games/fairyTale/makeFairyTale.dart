@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:playschool/src/games/fairyTale/fairyTaleList.dart';
 
 import '../../common/component/color.dart';
@@ -27,7 +28,7 @@ class MakeFairyTaleScreen extends StatelessWidget {
             child: Column(
               children: [
                 _MakeFairyTaleHeader(gameData: gameData,),
-                _fairyListPart(),
+                _fairyListPart(gameData: gameData,),
                 Divider(
                   color: MAKE_STROKE_COLOR,
                   indent: 26,
@@ -118,7 +119,12 @@ class _MakeFairyTaleHeader extends StatelessWidget {
 }
 
 class _fairyListPart extends StatelessWidget {
-  const _fairyListPart({super.key});
+  final GameData gameData;
+
+  const _fairyListPart({
+    super.key,
+    required this.gameData,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -158,35 +164,40 @@ class _fairyListPart extends StatelessWidget {
                 ),
                 itemCount: fairyTaleList.length,
                 itemBuilder: (context, index) {
-                  return Container(
-                    decoration: BoxDecoration(
-                        border: Border.all(color: MAKE_STROKE_COLOR, width: 2),
-                        borderRadius: BorderRadius.circular(30)
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 16.0),
-                      child: Column(
-                        children: [
-                          Image.asset(fairyTaleList[index].iconPath,
-                            width: 70,
-                            height: 70,
-                          ),
-                          Align(
-                            alignment: Alignment.center,
-                            heightFactor: 0.5,
-                            child: Image.asset("assets/icon/open-book-side-view.png",
+                  return GestureDetector(
+                    onTap: () {
+                      context.push("/selectFairyTaleBook", extra: fairyTaleList[index]);
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                          border: Border.all(color: MAKE_STROKE_COLOR, width: 2),
+                          borderRadius: BorderRadius.circular(30)
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 16.0),
+                        child: Column(
+                          children: [
+                            Image.asset(fairyTaleList[index].iconPath,
                               width: 70,
                               height: 70,
                             ),
-                          ),
-                          Text(fairyTaleList[index].fiaryName,
-                            style: TextStyle(
-                              color: MAKE_TEXT_COLOR,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 15.0,
+                            Align(
+                              alignment: Alignment.center,
+                              heightFactor: 0.5,
+                              child: Image.asset("assets/icon/open-book-side-view.png",
+                                width: 70,
+                                height: 70,
+                              ),
                             ),
-                          )
-                        ],
+                            Text(fairyTaleList[index].fiaryName,
+                              style: TextStyle(
+                                color: MAKE_TEXT_COLOR,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 15.0,
+                              ),
+                            )
+                          ],
+                        ),
                       ),
                     ),
                   );

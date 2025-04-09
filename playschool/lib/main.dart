@@ -5,13 +5,17 @@ import 'package:playschool/src/common/component/color.dart';
 import 'package:playschool/src/common/detailGame/detailGame.dart';
 import 'package:playschool/src/common/detailGame/gameInfo.dart';
 import 'package:playschool/src/games/drawing/drawingGame.dart';
+import 'package:playschool/src/games/fairyTale/fairyTaleList.dart';
 import 'package:playschool/src/games/fairyTale/makeFairyTale.dart';
+import 'package:playschool/src/games/fairyTale/selectFairyTale.dart';
 import 'package:playschool/src/games/puzzleGame/cubit/puzzleCubit.dart';
 import 'package:playschool/src/games/puzzleGame/puzzle.dart';
 import 'package:playschool/src/home.dart';
 import 'package:playschool/src/myPage/myPage.dart';
 import 'package:playschool/src/authentication/login.dart';
 import 'package:playschool/src/authentication/signup.dart';
+
+import 'src/games/fairyTale/fairyTaleList.dart';
 
 void main() {
   runApp(const MyApp());
@@ -82,5 +86,12 @@ final GoRouter _router = GoRouter(
         return MakeFairyTaleScreen(gameData: gameData!);
       },
     ),
+    GoRoute(
+      path: "/selectFairyTaleBook",
+      builder: (context, state) {
+        final fairyTaleInfo = state.extra as FairyTaleInfo?;
+        return SelectFairyTaleScreen(fairyTaleInfo: fairyTaleInfo!);
+      },
+    )
   ]
 );
