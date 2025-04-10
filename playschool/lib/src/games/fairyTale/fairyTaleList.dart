@@ -1,21 +1,29 @@
 FairyTaleInfo dungeonWithDragon = FairyTaleInfo(
   iconPath: "assets/icon/fairyDragon.png",
-  fiaryName: "용과의 모험"
+  fiaryName: "용과의 모험",
+  fairySub: "용과 즐거운 모험을 떠나보자!",
+  settingsFairyTale: dungeonWithDragonSetting,
 );
 
 FairyTaleInfo magicForest = FairyTaleInfo(
-    iconPath: "assets/icon/forest.png",
-    fiaryName: "마법의 숲"
+  iconPath: "assets/icon/forest.png",
+  fiaryName: "마법의 숲",
+  fairySub: "",
+  settingsFairyTale: magicForestSetting,
 );
 
 FairyTaleInfo ocean = FairyTaleInfo(
-    iconPath: "assets/icon/ocean.png",
-    fiaryName: "바다 속 탐험"
+  iconPath: "assets/icon/ocean.png",
+  fiaryName: "바다 속 탐험",
+    fairySub: "",
+  settingsFairyTale: oceanSetting
 );
 
 FairyTaleInfo spaceTrip = FairyTaleInfo(
-    iconPath: "assets/icon/galaxy.png",
-    fiaryName: "우주여행"
+  iconPath: "assets/icon/galaxy.png",
+  fiaryName: "우주여행",
+  fairySub: "",
+  settingsFairyTale: spaceTripSetting,
 );
 
 List<FairyTaleInfo> fairyTaleList = [dungeonWithDragon, magicForest, ocean, spaceTrip];
@@ -23,10 +31,14 @@ List<FairyTaleInfo> fairyTaleList = [dungeonWithDragon, magicForest, ocean, spac
 class FairyTaleInfo {
   final String iconPath;
   final String fiaryName;
+  final String fairySub;
+  final SettingsFairyTale settingsFairyTale;
 
   const FairyTaleInfo({
     required this.iconPath,
-    required this.fiaryName
+    required this.fiaryName,
+    required this.fairySub,
+    required this.settingsFairyTale,
   });
 }
 
@@ -52,7 +64,7 @@ List<SettingInfo> dragonDungeonBgs = [
 ];
 
 SettingsFairyTale dungeonWithDragonSetting = SettingsFairyTale(
-  scene: "",
+  scene: "____(이)가 용과 함께 ____에서 ____를 하고 있어!",
   characters: dragonDungeonCharacters,
   actions: dragonDungeonActions,
   backgrounds: dragonDungeonBgs
@@ -108,8 +120,6 @@ SettingsFairyTale spaceTripSetting = SettingsFairyTale(
     actions: spaceTripActions,
     backgrounds: spaceTripBgs
 );
-
-List<SettingsFairyTale> fairyTaleSettingList = [dungeonWithDragonSetting, oceanSetting, magicForestSetting, spaceTripSetting];
 
 class SettingsFairyTale {
   final String scene;
