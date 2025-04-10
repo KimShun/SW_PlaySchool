@@ -17,6 +17,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
 @RequiredArgsConstructor
@@ -27,16 +28,14 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/signup", "/auth/login").permitAll()
-                        
-                )
-                .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authenticationProvider(authenticationProvider())
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
+        http
+            .csrf(AbstractHttpConfigurer::disable)
+            .authorizeHttpRequests((authorize) -> authorize
+                .requestMatchers(new AntPathRequestMatcher("/api/auth/login")).permitAll()
+                .requestMatchers(new AntPathRequestMatcher("/api/auth/signup")).permitAll()
+                .anyRequest().permitAll()
+            );
         return http.build();
     }
 

@@ -9,15 +9,14 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SignupRequestDto {
-
-    @Pattern(regexp = "^[a-zA-Z0-9]{5,20}$", message = "아이디는 영문+숫자 조합, 5~20자여야 합니다.")
-    private String username;
+    @Email(message = "올바른 이메일 형식이 아닙니다.")
+    private String email; // 이메일
 
     @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*#?&])[A-Za-z\\d@$!%*#?&]{8,}$",
             message = "비밀번호는 영문+숫자+특수문자를 포함한 8자 이상이어야 합니다.")
     private String password;
 
-    @NotBlank
+    @NotBlank(message = "닉네임 입력")
     private String nickname;
 
     @Past(message = "생년월일은 과거 날짜여야 합니다.")

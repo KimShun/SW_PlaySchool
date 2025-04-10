@@ -3,27 +3,28 @@ package com.example.jwt.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Table(name = "users") // postgresql에서 "user"는 예약어
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "userUID", nullable = false, unique = true)
+    private String userUID;
 
-    @Column(nullable = false, length = 20, unique = true)
-    private String username;
+    @Column(nullable = false, length = 255, unique = true)
+    private String email;
 
     @Column(nullable = false)
     private String password;
 
-    @Column(nullable = false, length = 30)
+    @Column(nullable = false, length = 50)
     private String nickname;
 
     @Column(name = "birth_date", nullable = false)
@@ -33,10 +34,9 @@ public class User {
     private String gender;
 
     @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDate createdAt;
+    private LocalDateTime createdAt;
 
-    @PrePersist
-    protected void onCreate() {
-        this.createdAt = LocalDate.now();
+    public User() {
+        this.userUID = UUID.randomUUID().toString();
     }
 }

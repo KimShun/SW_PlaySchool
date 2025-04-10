@@ -17,12 +17,12 @@ public class AuthService {
     private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
     public void signup(SignupRequestDto dto) {
-        if (userRepository.findByUsername(dto.getUsername()).isPresent()) {
+        if (userRepository.findByEmail(dto.getEmail()).isPresent()) {
             throw new IllegalArgumentException("이미 사용 중인 아이디입니다.");
         }
 
         User user = User.builder()
-                .username(dto.getUsername())
+                .email(dto.getEmail())
                 .password(encoder.encode(dto.getPassword()))
                 .nickname(dto.getNickname())
                 .birthDate(dto.getBirthDate())
@@ -33,13 +33,20 @@ public class AuthService {
     }
 
     public String login(LoginRequestDto dto) {
-        User user = userRepository.findByUsername(dto.getUsername())
+        User user = userRepository.findByEmail(dto.getEmail())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 아이디입니다."));
 
         if (!encoder.matches(dto.getPassword(), user.getPassword())) {
             throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
 
-        return jwtUtil.generateToken(user.getUsername());
+        return jwtUtil.generateToken(user.getEmail());
+    }
+
+    public User getUserByToken(String token) {
+        String userEmail = jwtUtil.getEmailFromToken(token);
+        User user = userRepository.findByEmail(userEmail).orElse(null);
+        
+        return user;
     }
 }
