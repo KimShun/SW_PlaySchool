@@ -8,8 +8,10 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:ui' as ui;
 
+import '../../configure.dart';
+
 class PuzzleCubit extends Cubit<PuzzleState> {
-  final String imageUrl = "https://th.bing.com/th/id/OIP.W_jE3Gz7KaX_EeHEbW4FqwAAAA?rs=1&pid=ImgDetMain";
+  final String imageUrl = todayImage;
   final AudioPlayer _player = AudioPlayer();
 
   PuzzleCubit() : super(PuzzleState()) {

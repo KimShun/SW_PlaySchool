@@ -8,8 +8,10 @@ import 'package:playschool/src/games/drawing/drawingGame.dart';
 import 'package:playschool/src/games/fairyTale/fairyTaleList.dart';
 import 'package:playschool/src/games/fairyTale/makeFairyTale.dart';
 import 'package:playschool/src/games/fairyTale/selectFairyTale.dart';
-import 'package:playschool/src/games/puzzleGame/cubit/puzzleCubit.dart';
-import 'package:playschool/src/games/puzzleGame/puzzle.dart';
+import 'package:playschool/src/games/today/puzzleGame/cubit/puzzleCubit.dart';
+import 'package:playschool/src/games/today/puzzleGame/puzzle.dart';
+import 'package:playschool/src/games/today/wordGame/cubit/wordCubit.dart';
+import 'package:playschool/src/games/today/wordGame/word.dart';
 import 'package:playschool/src/home.dart';
 import 'package:playschool/src/myPage/myPage.dart';
 import 'package:playschool/src/authentication/login.dart';
@@ -33,7 +35,8 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider(create: (context) => PuzzleCubit())
+        BlocProvider(create: (context) => PuzzleCubit()),
+        BlocProvider(create: (context) => WordCubit()),
       ],
       child: MaterialApp.router(
         theme: ThemeData(
@@ -46,7 +49,7 @@ class _MyAppState extends State<MyApp> {
 }
 
 final GoRouter _router = GoRouter(
-  initialLocation: "/",
+  initialLocation: "/wordGame",
   routes: [
     GoRoute(
       path: "/",
@@ -67,6 +70,10 @@ final GoRouter _router = GoRouter(
     GoRoute(
       path: "/puzzleGame",
       builder: (context, state) => const PuzzleGame(),
+    ),
+    GoRoute(
+      path: "/wordGame",
+      builder: (context, state) => const wordGame(),
     ),
     GoRoute(
       path: "/detailGame",
