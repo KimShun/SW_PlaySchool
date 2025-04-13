@@ -49,7 +49,7 @@ class _MyAppState extends State<MyApp> {
 }
 
 final GoRouter _router = GoRouter(
-  initialLocation: "/wordGame",
+  initialLocation: "/",
   routes: [
     GoRoute(
       path: "/",

@@ -19,6 +19,10 @@ class PuzzleCubit extends Cubit<PuzzleState> {
     loadImageUrl();
   }
 
+  void pauseBGM() async {
+    await _player.dispose();
+  }
+
   void puzzleDone() {
     emit(state.copyWith(status: PuzzleStatus.done));
   }
