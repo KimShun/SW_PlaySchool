@@ -4,13 +4,32 @@ import 'package:playschool/src/games/fairyTale/fairyTaleList.dart';
 
 import '../../common/component/color.dart';
 
-class SelectFairyTaleScreen extends StatelessWidget {
+class SelectFairyTaleScreen extends StatefulWidget {
   final FairyTaleInfo fairyTaleInfo;
 
   const SelectFairyTaleScreen({
     super.key,
     required this.fairyTaleInfo,
   });
+
+  @override
+  State<SelectFairyTaleScreen> createState() => _SelectFairyTaleScreenState();
+}
+
+class _SelectFairyTaleScreenState extends State<SelectFairyTaleScreen> {
+  int _resetKey = 0;
+  SettingInfo? selectedCharacter;
+  SettingInfo? selectedAction;
+  SettingInfo? selectedBackground;
+
+  void _resetSelections() {
+    setState(() {
+      _resetKey++;
+      selectedCharacter = null;
+      selectedAction = null;
+      selectedBackground = null;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,37 +54,56 @@ class SelectFairyTaleScreen extends StatelessWidget {
               scrollDirection: Axis.vertical,
               child: Column(
                 children: [
-                  _detailHeader(fairyTaleInfo: fairyTaleInfo),
+                  _detailHeader(fairyTaleInfo: widget.fairyTaleInfo),
                   const SizedBox(height: 15.0),
                   _selectFactorList(
                     iconPath: "assets/icon/character-design.png",
                     listName: "등장인물",
-                    characters: fairyTaleInfo.settingsFairyTale.characters
+                    factors: widget.fairyTaleInfo.settingsFairyTale.characters,
+                    onSelected: (value) {
+                      setState(() {
+                        selectedCharacter = value;
+                      });
+                    },
+                    resetKey: _resetKey,
                   ),
                   const SizedBox(height: 15.0),
                   _selectFactorList(
                     iconPath: "assets/icon/action.png",
                     listName: "행동",
-                    characters: fairyTaleInfo.settingsFairyTale.actions
+                    factors: widget.fairyTaleInfo.settingsFairyTale.actions,
+                    onSelected: (value) {
+                      setState(() {
+                        selectedAction = value;
+                      });
+                    },
+                    resetKey: _resetKey,
                   ),
                   const SizedBox(height: 15.0),
                   _selectFactorList(
                     iconPath: "assets/icon/background.png",
                     listName: "배경",
-                    characters: fairyTaleInfo.settingsFairyTale.backgrounds
+                    factors: widget.fairyTaleInfo.settingsFairyTale.backgrounds,
+                    onSelected: (value) {
+                      setState(() {
+                        selectedBackground = value;
+                      });
+                    },
+                    resetKey: _resetKey,
                   ),
-                  const SizedBox(height: 15.0),
-                  Divider(
-                    color: MAKE_STROKE_COLOR,
-                    indent: 23, endIndent: 23,
-                  ),
-                  const SizedBox(height: 15.0),
-                  _makeFairyTaleBtns()
+                  const SizedBox(height: 90.0),
                 ],
               ),
             ),
           )
         ],
+      ),
+      bottomNavigationBar: _makeFairyTaleBtns(
+        fairyTaleInfo: widget.fairyTaleInfo,
+        selectedCharacter: selectedCharacter,
+        selectedAction: selectedAction,
+        selectedBackground: selectedBackground,
+        resetSelections: _resetSelections,
       ),
     );
   }
@@ -174,13 +212,17 @@ class _detailHeader extends StatelessWidget {
 class _selectFactorList extends StatefulWidget {
   final String iconPath;
   final String listName;
-  final List<SettingInfo> characters;
+  final List<SettingInfo> factors;
+  final void Function(SettingInfo selected)? onSelected;
+  final int resetKey;
 
   const _selectFactorList({
     super.key,
     required this.iconPath,
     required this.listName,
-    required this.characters,
+    required this.factors,
+    this.onSelected,
+    required this.resetKey,
   });
 
   @override
@@ -189,6 +231,27 @@ class _selectFactorList extends StatefulWidget {
 
 class _selectFactorListState extends State<_selectFactorList> {
   int? _selectedIndex;
+  late int _lastResetKey;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _lastResetKey = widget.resetKey;
+  }
+
+  @override
+  void didUpdateWidget(covariant _selectFactorList oldWidget) {
+    // TODO: implement didUpdateWidget
+    super.didUpdateWidget(oldWidget);
+
+    if(widget.resetKey != _lastResetKey) {
+      setState(() {
+        _selectedIndex = null;
+        _lastResetKey = widget.resetKey;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -216,7 +279,7 @@ class _selectFactorListState extends State<_selectFactorList> {
             height: 140,
             child: ListView.separated(
                 scrollDirection: Axis.horizontal,
-                itemCount: widget.characters.length,
+                itemCount: widget.factors.length,
                 separatorBuilder: (context, index) => const SizedBox(width: 20.0),
                 itemBuilder: (context, index) {
                   return Stack(
@@ -225,12 +288,12 @@ class _selectFactorListState extends State<_selectFactorList> {
                         padding: const EdgeInsets.only(top: 25.0, left: 25.0),
                         child: Column(
                           children: [
-                            Image.asset(widget.characters[index].iconPath,
+                            Image.asset(widget.factors[index].iconPath,
                               width: 80,
                               height: 80,
                             ),
                             const SizedBox(height: 10.0),
-                            Text(widget.characters[index].name,
+                            Text(widget.factors[index].name,
                               style: TextStyle(
                                 color: MAKE_TEXT_COLOR,
                                 fontWeight: FontWeight.bold,
@@ -250,6 +313,10 @@ class _selectFactorListState extends State<_selectFactorList> {
                             setState(() {
                               _selectedIndex = value;
                             });
+
+                            if(widget.onSelected != null) {
+                              widget.onSelected!(widget.factors[index]);
+                            }
                           },
                           activeColor: MAKE_STROKE_COLOR,
                         ),
@@ -266,19 +333,42 @@ class _selectFactorListState extends State<_selectFactorList> {
 }
 
 class _makeFairyTaleBtns extends StatelessWidget {
-  const _makeFairyTaleBtns({super.key});
+  final FairyTaleInfo fairyTaleInfo;
+  final SettingInfo? selectedCharacter;
+  final SettingInfo? selectedAction;
+  final SettingInfo? selectedBackground;
+  final void Function() resetSelections;
+
+  const _makeFairyTaleBtns({
+    super.key,
+    required this.fairyTaleInfo,
+    required this.selectedCharacter,
+    required this.selectedAction,
+    required this.selectedBackground,
+    required this.resetSelections,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 15.0),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           Row(
             children: [
               Expanded(
                 child: ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    if(selectedCharacter != null && selectedAction != null && selectedBackground != null) {
+                      print("선택된 주제: ${fairyTaleInfo.fiaryName}");
+                      print("선택된 등장인물: ${selectedCharacter!.name}");
+                      print("선택된 행동: ${selectedAction!.name}");
+                      print("선택된 배경: ${selectedBackground!.name}");
+                    } else {
+                      print("항목을 전부 선택해주셔야 합니다.");
+                    }
+                  },
                   style: ElevatedButton.styleFrom(
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(15),
@@ -311,7 +401,7 @@ class _makeFairyTaleBtns extends StatelessWidget {
               ),
               const SizedBox(width: 10),
               ElevatedButton(
-                  onPressed: () {},
+                  onPressed: resetSelections,
                   style: ElevatedButton.styleFrom(
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(15), // 모서리 둥글게
