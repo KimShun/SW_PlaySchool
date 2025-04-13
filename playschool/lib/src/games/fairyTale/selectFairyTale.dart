@@ -1,5 +1,7 @@
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:lottie/lottie.dart';
 import 'package:playschool/src/games/fairyTale/fairyTaleList.dart';
 
 import '../../common/component/color.dart';
@@ -361,12 +363,15 @@ class _makeFairyTaleBtns extends StatelessWidget {
                 child: ElevatedButton(
                   onPressed: () {
                     if(selectedCharacter != null && selectedAction != null && selectedBackground != null) {
-                      print("선택된 주제: ${fairyTaleInfo.fiaryName}");
-                      print("선택된 등장인물: ${selectedCharacter!.name}");
-                      print("선택된 행동: ${selectedAction!.name}");
-                      print("선택된 배경: ${selectedBackground!.name}");
+                      _showWaitingDialog(context);
+                      // context.push("/completeFairyTaleBook", extra: {
+                      //   "fairyTaleInfo" : fairyTaleInfo,
+                      //   "selectedCharacter" : selectedCharacter,
+                      //   "selectedAction" : selectedAction,
+                      //   "selectedBackground" : selectedBackground
+                      // });
                     } else {
-                      print("항목을 전부 선택해주셔야 합니다.");
+                      _showFailedDialog(context);
                     }
                   },
                   style: ElevatedButton.styleFrom(
@@ -429,6 +434,99 @@ class _makeFairyTaleBtns extends StatelessWidget {
           const SizedBox(height: 20.0),
         ],
       ),
+    );
+  }
+
+  void _showWaitingDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16), // 모서리 둥글게
+          ),
+          backgroundColor: BG_COLOR,
+          content: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Lottie.asset("assets/lottie/waiting_animal.json",
+                width: 150,
+                height: 150,
+              ),
+              const SizedBox(height: 10),
+              Text("🪡 생성중~~!! 🧵",
+                style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 17,
+                    color: Y_TEXT_COLOR
+                ),
+              ),
+              Text("조금만 기달려줘...",
+                style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 17,
+                    color: TEXT_COLOR
+                ),
+              ),
+              Text("열심히 그리고 있어!! (쓱싹쓱싹)",
+                style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 17,
+                    color: TEXT_COLOR
+                ),
+              ),
+            ],
+          ),
+        );
+      }
+    );
+  }
+
+  void _showFailedDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        Future.delayed(const Duration(seconds: 3), () {
+          if(Navigator.of(context).canPop()) {
+            Navigator.of(context).pop();
+          }
+        });
+
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16), // 모서리 둥글게
+          ),
+          backgroundColor: BG_COLOR,
+          content: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Lottie.asset("assets/lottie/failed.json",
+                width: 150,
+                height: 150,
+              ),
+              const SizedBox(height: 10),
+              Text("😭 잘못됐어... ㅠㅠ 😭",
+                style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 17,
+                    color: Y_TEXT_COLOR
+                ),
+              ),
+              Text("항목을 전부 선택해줘야 해!",
+                style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 17,
+                    color: TEXT_COLOR
+                ),
+              ),
+            ],
+          ),
+        );
+      }
     );
   }
 }

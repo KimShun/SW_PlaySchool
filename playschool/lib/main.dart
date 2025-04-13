@@ -103,7 +103,10 @@ final GoRouter _router = GoRouter(
     ),
     GoRoute(
       path: "/completeFairyTaleBook",
-      builder: (context, state) => const CompletefairytaleScreen(),
+      builder: (context, state) {
+        final args = state.extra as Map<String, dynamic>?;
+        return CompleteFairyTaleScreen(args: args!);
+      },
     )
   ]
 );
