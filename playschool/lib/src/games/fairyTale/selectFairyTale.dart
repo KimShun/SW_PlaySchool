@@ -1,16 +1,37 @@
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:lottie/lottie.dart';
 import 'package:playschool/src/games/fairyTale/fairyTaleList.dart';
 
 import '../../common/component/color.dart';
 
-class SelectFairyTaleScreen extends StatelessWidget {
+class SelectFairyTaleScreen extends StatefulWidget {
   final FairyTaleInfo fairyTaleInfo;
 
   const SelectFairyTaleScreen({
     super.key,
     required this.fairyTaleInfo,
   });
+
+  @override
+  State<SelectFairyTaleScreen> createState() => _SelectFairyTaleScreenState();
+}
+
+class _SelectFairyTaleScreenState extends State<SelectFairyTaleScreen> {
+  int _resetKey = 0;
+  SettingInfo? selectedCharacter;
+  SettingInfo? selectedAction;
+  SettingInfo? selectedBackground;
+
+  void _resetSelections() {
+    setState(() {
+      _resetKey++;
+      selectedCharacter = null;
+      selectedAction = null;
+      selectedBackground = null;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,37 +56,56 @@ class SelectFairyTaleScreen extends StatelessWidget {
               scrollDirection: Axis.vertical,
               child: Column(
                 children: [
-                  _detailHeader(fairyTaleInfo: fairyTaleInfo),
+                  _detailHeader(fairyTaleInfo: widget.fairyTaleInfo),
                   const SizedBox(height: 15.0),
                   _selectFactorList(
                     iconPath: "assets/icon/character-design.png",
                     listName: "등장인물",
-                    characters: fairyTaleInfo.settingsFairyTale.characters
+                    factors: widget.fairyTaleInfo.settingsFairyTale.characters,
+                    onSelected: (value) {
+                      setState(() {
+                        selectedCharacter = value;
+                      });
+                    },
+                    resetKey: _resetKey,
                   ),
                   const SizedBox(height: 15.0),
                   _selectFactorList(
                     iconPath: "assets/icon/action.png",
                     listName: "행동",
-                    characters: fairyTaleInfo.settingsFairyTale.actions
+                    factors: widget.fairyTaleInfo.settingsFairyTale.actions,
+                    onSelected: (value) {
+                      setState(() {
+                        selectedAction = value;
+                      });
+                    },
+                    resetKey: _resetKey,
                   ),
                   const SizedBox(height: 15.0),
                   _selectFactorList(
                     iconPath: "assets/icon/background.png",
                     listName: "배경",
-                    characters: fairyTaleInfo.settingsFairyTale.backgrounds
+                    factors: widget.fairyTaleInfo.settingsFairyTale.backgrounds,
+                    onSelected: (value) {
+                      setState(() {
+                        selectedBackground = value;
+                      });
+                    },
+                    resetKey: _resetKey,
                   ),
-                  const SizedBox(height: 15.0),
-                  Divider(
-                    color: MAKE_STROKE_COLOR,
-                    indent: 23, endIndent: 23,
-                  ),
-                  const SizedBox(height: 15.0),
-                  _makeFairyTaleBtns()
+                  const SizedBox(height: 90.0),
                 ],
               ),
             ),
           )
         ],
+      ),
+      bottomNavigationBar: _makeFairyTaleBtns(
+        fairyTaleInfo: widget.fairyTaleInfo,
+        selectedCharacter: selectedCharacter,
+        selectedAction: selectedAction,
+        selectedBackground: selectedBackground,
+        resetSelections: _resetSelections,
       ),
     );
   }
@@ -174,13 +214,17 @@ class _detailHeader extends StatelessWidget {
 class _selectFactorList extends StatefulWidget {
   final String iconPath;
   final String listName;
-  final List<SettingInfo> characters;
+  final List<SettingInfo> factors;
+  final void Function(SettingInfo selected)? onSelected;
+  final int resetKey;
 
   const _selectFactorList({
     super.key,
     required this.iconPath,
     required this.listName,
-    required this.characters,
+    required this.factors,
+    this.onSelected,
+    required this.resetKey,
   });
 
   @override
@@ -189,6 +233,27 @@ class _selectFactorList extends StatefulWidget {
 
 class _selectFactorListState extends State<_selectFactorList> {
   int? _selectedIndex;
+  late int _lastResetKey;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _lastResetKey = widget.resetKey;
+  }
+
+  @override
+  void didUpdateWidget(covariant _selectFactorList oldWidget) {
+    // TODO: implement didUpdateWidget
+    super.didUpdateWidget(oldWidget);
+
+    if(widget.resetKey != _lastResetKey) {
+      setState(() {
+        _selectedIndex = null;
+        _lastResetKey = widget.resetKey;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -216,7 +281,7 @@ class _selectFactorListState extends State<_selectFactorList> {
             height: 140,
             child: ListView.separated(
                 scrollDirection: Axis.horizontal,
-                itemCount: widget.characters.length,
+                itemCount: widget.factors.length,
                 separatorBuilder: (context, index) => const SizedBox(width: 20.0),
                 itemBuilder: (context, index) {
                   return Stack(
@@ -225,12 +290,12 @@ class _selectFactorListState extends State<_selectFactorList> {
                         padding: const EdgeInsets.only(top: 25.0, left: 25.0),
                         child: Column(
                           children: [
-                            Image.asset(widget.characters[index].iconPath,
+                            Image.asset(widget.factors[index].iconPath,
                               width: 80,
                               height: 80,
                             ),
                             const SizedBox(height: 10.0),
-                            Text(widget.characters[index].name,
+                            Text(widget.factors[index].name,
                               style: TextStyle(
                                 color: MAKE_TEXT_COLOR,
                                 fontWeight: FontWeight.bold,
@@ -250,6 +315,10 @@ class _selectFactorListState extends State<_selectFactorList> {
                             setState(() {
                               _selectedIndex = value;
                             });
+
+                            if(widget.onSelected != null) {
+                              widget.onSelected!(widget.factors[index]);
+                            }
                           },
                           activeColor: MAKE_STROKE_COLOR,
                         ),
@@ -266,19 +335,45 @@ class _selectFactorListState extends State<_selectFactorList> {
 }
 
 class _makeFairyTaleBtns extends StatelessWidget {
-  const _makeFairyTaleBtns({super.key});
+  final FairyTaleInfo fairyTaleInfo;
+  final SettingInfo? selectedCharacter;
+  final SettingInfo? selectedAction;
+  final SettingInfo? selectedBackground;
+  final void Function() resetSelections;
+
+  const _makeFairyTaleBtns({
+    super.key,
+    required this.fairyTaleInfo,
+    required this.selectedCharacter,
+    required this.selectedAction,
+    required this.selectedBackground,
+    required this.resetSelections,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 15.0),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           Row(
             children: [
               Expanded(
                 child: ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    if(selectedCharacter != null && selectedAction != null && selectedBackground != null) {
+                      _showWaitingDialog(context);
+                      // context.push("/completeFairyTaleBook", extra: {
+                      //   "fairyTaleInfo" : fairyTaleInfo,
+                      //   "selectedCharacter" : selectedCharacter,
+                      //   "selectedAction" : selectedAction,
+                      //   "selectedBackground" : selectedBackground
+                      // });
+                    } else {
+                      _showFailedDialog(context);
+                    }
+                  },
                   style: ElevatedButton.styleFrom(
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(15),
@@ -311,7 +406,7 @@ class _makeFairyTaleBtns extends StatelessWidget {
               ),
               const SizedBox(width: 10),
               ElevatedButton(
-                  onPressed: () {},
+                  onPressed: resetSelections,
                   style: ElevatedButton.styleFrom(
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(15), // 모서리 둥글게
@@ -339,6 +434,99 @@ class _makeFairyTaleBtns extends StatelessWidget {
           const SizedBox(height: 20.0),
         ],
       ),
+    );
+  }
+
+  void _showWaitingDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16), // 모서리 둥글게
+          ),
+          backgroundColor: BG_COLOR,
+          content: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Lottie.asset("assets/lottie/waiting_animal.json",
+                width: 150,
+                height: 150,
+              ),
+              const SizedBox(height: 10),
+              Text("🪡 생성중~~!! 🧵",
+                style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 17,
+                    color: Y_TEXT_COLOR
+                ),
+              ),
+              Text("조금만 기달려줘...",
+                style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 17,
+                    color: TEXT_COLOR
+                ),
+              ),
+              Text("열심히 그리고 있어!! (쓱싹쓱싹)",
+                style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 17,
+                    color: TEXT_COLOR
+                ),
+              ),
+            ],
+          ),
+        );
+      }
+    );
+  }
+
+  void _showFailedDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        Future.delayed(const Duration(seconds: 3), () {
+          if(Navigator.of(context).canPop()) {
+            Navigator.of(context).pop();
+          }
+        });
+
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16), // 모서리 둥글게
+          ),
+          backgroundColor: BG_COLOR,
+          content: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Lottie.asset("assets/lottie/failed.json",
+                width: 150,
+                height: 150,
+              ),
+              const SizedBox(height: 10),
+              Text("😭 잘못됐어... ㅠㅠ 😭",
+                style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 17,
+                    color: Y_TEXT_COLOR
+                ),
+              ),
+              Text("항목을 전부 선택해줘야 해!",
+                style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 17,
+                    color: TEXT_COLOR
+                ),
+              ),
+            ],
+          ),
+        );
+      }
     );
   }
 }

@@ -76,6 +76,7 @@ class PuzzleGame extends StatelessWidget {
                                             children: [
                                               GestureDetector(
                                                 onTap: () {
+                                                  context.read<PuzzleCubit>().pauseBGM();
                                                   Navigator.of(context).pop();
                                                 },
                                                 child: Image.asset("assets/icon/exit.png",
