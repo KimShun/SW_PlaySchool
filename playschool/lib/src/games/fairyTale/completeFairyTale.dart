@@ -21,6 +21,10 @@ class CompleteFairyTaleScreen extends StatelessWidget {
       {
         "image" : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSFVFxfeGIN-ceu1MAh1PWlG_WA-JZs7nEXPw&s",
         "content" : "멋쟁이 고양이가 여유롭게 쉬고 있어!!"
+      },
+      {
+        "image" : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQHXmtOlXqSp1QkPlvIXRD2esqZpf_dbWhahQ&s",
+        "content" : "힝.. 라면이 먹고 싶은 강아지... ㅠㅠ"
       }
     ];
 
