@@ -17,7 +17,8 @@ import 'package:playschool/src/home.dart';
 import 'package:playschool/src/myPage/myPage.dart';
 import 'package:playschool/src/authentication/login.dart';
 import 'package:playschool/src/authentication/signup.dart';
-
+import 'package:playschool/src/common/detailGame/games/drawing/drawingGame.dart';
+import 'package:playschool/src/common/detailGame/games/drawing/drawingdetail.dart';
 import 'src/games/fairyTale/fairyTaleList.dart';
 
 void main() {
@@ -86,6 +87,14 @@ final GoRouter _router = GoRouter(
     GoRoute(
       path: "/drawingGame",
       builder: (context, state) => const DrawingGameScreen(),
+    ),
+    GoRoute(
+      path: '/drawingDetail',
+      builder: (context, state) {
+        final name = state.extra != null ? (state.extra as Map)['name'] : '';
+        final imagePath = state.extra != null ? (state.extra as Map)['imagePath'] : '';
+        return DrawingDetailScreen(name: name, imagePath: imagePath);
+      },
     ),
     GoRoute(
       path: "/makeFairyTaleBook",
