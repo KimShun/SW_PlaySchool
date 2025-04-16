@@ -14,6 +14,13 @@ class DetailGameScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    bool hasSafeArea(BuildContext context) {
+      final padding = MediaQuery.of(context).padding;
+      return padding.top > 20;
+    }
+
+    bool needsSafeArea = hasSafeArea(context);
+
     return Scaffold(
       extendBody: true,
       body: Stack(
@@ -22,24 +29,22 @@ class DetailGameScreen extends StatelessWidget {
             opacity: 0.15,
             child: Image.asset("assets/background/main_bg.png"),
           ),
-          SafeArea(
-            child: SingleChildScrollView(
-              scrollDirection: Axis.vertical,
-              child: Padding(
-                padding: const EdgeInsets.all(15.0),
-                child: Column(
-                  children: [
-                    _detailHeader(gameData: gameData),
-                    const SizedBox(height: 15),
-                    _detailButtons(gameData: gameData),
-                    const SizedBox(height: 15),
-                    _detailDescription(gameData: gameData),
-                    const SizedBox(height: 15),
-                    _detailPreview(gameData: gameData),
-                    const SizedBox(height: 15),
-                    _detailDifficult(gameData: gameData),
-                  ],
-                ),
+          SingleChildScrollView(
+            scrollDirection: Axis.vertical,
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 15.0, vertical: needsSafeArea ? 0 : 15.0),
+              child: Column(
+                children: [
+                  _detailHeader(gameData: gameData),
+                  const SizedBox(height: 15),
+                  _detailButtons(gameData: gameData),
+                  const SizedBox(height: 15),
+                  _detailDescription(gameData: gameData),
+                  const SizedBox(height: 15),
+                  _detailPreview(gameData: gameData),
+                  const SizedBox(height: 15),
+                  _detailDifficult(gameData: gameData),
+                ],
               ),
             ),
           )
@@ -51,6 +56,7 @@ class DetailGameScreen extends StatelessWidget {
 
 class _detailHeader extends StatelessWidget {
   final GameData gameData;
+
   const _detailHeader({
     super.key,
     required this.gameData
@@ -58,107 +64,116 @@ class _detailHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Container(
-          decoration: BoxDecoration(
+    return SafeArea(
+      top: true,
+      bottom: false,
+      child: Stack(
+        children: [
+          Container(
+            decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(30),
-            color: gameData.gameType == GameType.play
+              color: gameData.gameType == GameType.play
                 ? PLAY_HEADER_COLOR : gameData.gameType == GameType.ent
                 ? EXERCISE_HEADER_COLOR : MAKE_HEADER_COLOR,
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(15.0),
-            child: Column(
-              children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(1),
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: gameData.gameType == GameType.play
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(15.0),
+              child: Column(
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(1),
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: gameData.gameType == GameType.play
                                   ? PLAY_STROKE_COLOR : gameData.gameType == GameType.ent
                                   ? EXERCISE_STROKE_COLOR : MAKE_STROKE_COLOR,
-                              width:1
-                            ),
-                          ),
-                          child: CircleAvatar(
-                            radius: 45,
-                            backgroundImage: AssetImage(gameData.gameIconPath),
-                          ),
-                        ),
-                        const SizedBox(width: 10),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(gameData.name,
-                              style: TextStyle(
-                                  color: gameData.gameType == GameType.play
-                                      ? Y_TEXT_COLOR : gameData.gameType == GameType.ent
-                                      ? EXERCISE_TEXT_COLOR : MAKE_TEXT_COLOR,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 25.0
+                                width:1
                               ),
                             ),
-                            Text(gameData.shortDetail,
-                              style: TextStyle(
+                            child: CircleAvatar(
+                              radius: 45,
+                              backgroundImage: AssetImage(gameData.gameIconPath),
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(gameData.name,
+                                style: TextStyle(
+                                    color: gameData.gameType == GameType.play
+                                      ? Y_TEXT_COLOR : gameData.gameType == GameType.ent
+                                      ? EXERCISE_TEXT_COLOR : MAKE_TEXT_COLOR,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 25.0
+                                ),
+                              ),
+                              Text(gameData.shortDetail,
+                                style: TextStyle(
                                   color: TEXT_COLOR,
                                   fontWeight: FontWeight.normal,
                                   fontSize: 12.0
+                                ),
                               ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 18),
-                DottedBorder(
-                    color: gameData.gameType == GameType.play
-                        ? PLAY_STROKE_COLOR : gameData.gameType == GameType.ent
-                        ? EXERCISE_STROKE_COLOR : MAKE_STROKE_COLOR,
-                    borderType: BorderType.RRect,
-                    radius: const Radius.circular(30),
-                    child: Container(
-                      height: 210,
-                      decoration: BoxDecoration(
-                          color: gameData.gameType == GameType.play
-                              ? PLAY_CARD_COLOR : gameData.gameType == GameType.ent
-                              ? EXERCISE_CARD_COLOR : MAKE_CARD_COLOR,
-                          borderRadius: BorderRadius.circular(30)
+                            ],
+                          ),
+                        ],
                       ),
-                    )
-                ),
-              ],
+                    ],
+                  ),
+                  const SizedBox(height: 18),
+                  DottedBorder(
+                      color: gameData.gameType == GameType.play
+                          ? PLAY_STROKE_COLOR : gameData.gameType == GameType.ent
+                          ? EXERCISE_STROKE_COLOR : MAKE_STROKE_COLOR,
+                      borderType: BorderType.RRect,
+                      radius: const Radius.circular(30),
+                      child: Container(
+                        height: 210,
+                        decoration: BoxDecoration(
+                            color: gameData.gameType == GameType.play
+                                ? PLAY_CARD_COLOR : gameData.gameType == GameType.ent
+                                ? EXERCISE_CARD_COLOR : MAKE_CARD_COLOR,
+                            borderRadius: BorderRadius.circular(30)
+                        ),
+                      )
+                  ),
+                ],
+              ),
             ),
           ),
-        ),
-        Positioned(
-          top: MediaQuery.of(context).size.width * 0.035,
-          right: MediaQuery.of(context).size.width * 0.035,
-          child: Image.asset("assets/icon/exit.png",
-            width: 40,
-            height: 40,
-          ),
-        ),
-        Positioned(
-          top: MediaQuery.of(context).size.width * 0.28,
-          right: MediaQuery.of(context).size.width * 0.015,
-          child: Transform.rotate(
-            angle: 30 * 3.1415927 / 180,
-            child: Image.asset("assets/icon/ribbon.png",
-              width: 50,
-              height: 50,
+          Positioned(
+            top: MediaQuery.of(context).size.width * 0.035,
+            right: MediaQuery.of(context).size.width * 0.035,
+            child: GestureDetector(
+              onTap: () {
+                Navigator.of(context).pop();
+              },
+              child: Image.asset("assets/icon/exit.png",
+                width: 40,
+                height: 40,
+              ),
             ),
+          ),
+          Positioned(
+            top: MediaQuery.of(context).size.width * 0.28,
+            right: MediaQuery.of(context).size.width * 0.015,
+            child: Transform.rotate(
+              angle: 30 * 3.1415927 / 180,
+              child: Image.asset("assets/icon/ribbon.png",
+                width: 50,
+                height: 50,
+              ),
+            )
           )
-        )
-      ],
+        ],
+      ),
     );
   }
 }
@@ -184,12 +199,12 @@ class _detailButtons extends StatelessWidget {
                     "단어 맞추기": "",
                     "틀린그림찾기": "",
                     "율동 따라하기": "",
-                    "동화책 만들기": "",
+                    "동화책 만들기": "/makeFairyTaleBook",
                   };
 
                   final route = gameRouteMap[gameData.name];
                   if (route != null) {
-                    context.go(route);
+                    context.push(route, extra: gameData);
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text("이 게임은 아직 준비 중이에요!")),
@@ -294,11 +309,11 @@ class _detailDescription extends StatelessWidget {
             const SizedBox(width: 15),
             Text("게임설명",
               style: TextStyle(
-                  color: gameData.gameType == GameType.play
-                    ? Y_TEXT_COLOR : gameData.gameType == GameType.ent
-                    ? EXERCISE_TEXT_COLOR : MAKE_TEXT_COLOR,
-                  fontSize: 25.0,
-                  fontWeight: FontWeight.bold
+                color: gameData.gameType == GameType.play
+                  ? Y_TEXT_COLOR : gameData.gameType == GameType.ent
+                  ? EXERCISE_TEXT_COLOR : MAKE_TEXT_COLOR,
+                fontSize: 25.0,
+                fontWeight: FontWeight.bold
               ),
             )
           ],

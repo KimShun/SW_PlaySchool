@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lottie/lottie.dart';
 import 'package:playschool/src/common/component/color.dart';
-import 'package:playschool/src/puzzleGame/cubit/puzzleCubit.dart';
+
+import 'cubit/puzzleCubit.dart';
 
 class PuzzleGame extends StatelessWidget {
   const PuzzleGame({super.key});
@@ -73,9 +74,15 @@ class PuzzleGame extends StatelessWidget {
                                         children: [
                                           Row(
                                             children: [
-                                              Image.asset("assets/icon/exit.png",
-                                                width: 40,
-                                                height: 40,
+                                              GestureDetector(
+                                                onTap: () {
+                                                  context.read<PuzzleCubit>().pauseBGM();
+                                                  Navigator.of(context).pop();
+                                                },
+                                                child: Image.asset("assets/icon/exit.png",
+                                                  width: 40,
+                                                  height: 40,
+                                                ),
                                               ),
                                               Expanded(
                                                 child: Text("퍼즐 맞추기 ^o^",
