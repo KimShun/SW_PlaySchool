@@ -10,8 +10,9 @@ import 'package:playschool/src/puzzleGame/cubit/puzzleCubit.dart';
 import 'package:playschool/src/puzzleGame/puzzle.dart';
 import 'package:playschool/src/authentication/login.dart';
 import 'package:playschool/src/authentication/signup.dart';
-import 'package:playschool/src/common/detailGame/games/drawingGame.dart';
-
+import 'package:playschool/src/common/detailGame/games/drawing/drawingGame.dart';
+import 'package:playschool/src/common/detailGame/games/drawing/drawingdetail.dart';
+import 'package:playschool/test.dart';
 void main() {
   runApp(const MyApp());
 }
@@ -74,5 +75,14 @@ final GoRouter _router = GoRouter(
       path: "/drawingGame",
       builder: (context, state) => const DrawingGameScreen(),
     ),
+    GoRoute(
+      path: '/drawingDetail',
+      builder: (context, state) {
+        final name = state.extra != null ? (state.extra as Map)['name'] : '';
+        final imagePath = state.extra != null ? (state.extra as Map)['imagePath'] : '';
+        return DrawingDetailScreen(name: name, imagePath: imagePath);
+      },
+    ),
+    
   ]
 );
