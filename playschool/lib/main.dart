@@ -50,7 +50,7 @@ class _MyAppState extends State<MyApp> {
 }
 
 final GoRouter _router = GoRouter(
-  initialLocation: "/",
+  initialLocation: "/completeFairyTaleBook",
   routes: [
     GoRoute(
       path: "/",
@@ -104,8 +104,9 @@ final GoRouter _router = GoRouter(
     GoRoute(
       path: "/completeFairyTaleBook",
       builder: (context, state) {
-        final args = state.extra as Map<String, dynamic>?;
-        return CompleteFairyTaleScreen(args: args!);
+        // final args = state.extra as Map<String, dynamic>?;
+        // return CompleteFairyTaleScreen(args: args!);
+        return CompleteFairyTaleScreen();
       },
     )
   ]
