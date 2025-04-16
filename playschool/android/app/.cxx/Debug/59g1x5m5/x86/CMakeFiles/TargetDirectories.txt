@@ -1,0 +1,2 @@
+C:/Users/seowo/StudioProjects/SW_PlaySchool/playschool/android/app/.cxx/Debug/59g1x5m5/x86/CMakeFiles/edit_cache.dir
+C:/Users/seowo/StudioProjects/SW_PlaySchool/playschool/android/app/.cxx/Debug/59g1x5m5/x86/CMakeFiles/rebuild_cache.dir

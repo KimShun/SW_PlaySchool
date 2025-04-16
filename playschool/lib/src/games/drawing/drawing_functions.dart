@@ -6,10 +6,8 @@ import 'dart:ui' as ui;
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/rendering.dart';
-//import 'package:path_provider/path_provider.dart';
-import 'package:dartcv4/core.dart';
-import 'package:dartcv4/imgproc.dart';
-import 'package:dartcv4/imgcodecs.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:opencv_dart/opencv_dart.dart' as cv;
 
 /// 하나의 선
 class Stroke {
@@ -331,46 +329,46 @@ class _BrushSizeSliderState extends State<BrushSizeSlider> {
     );
   }
 }
-//
-// Future<double> compareWithOpenCV(ui.Image referenceImage, ui.Image userImage) async {
-//   Future<Uint8List> imageToBytes(ui.Image image) async {
-//     final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
-//     return byteData!.buffer.asUint8List();
-//   }
-//
-//   Future<String> saveTemp(Uint8List bytes, String filename) async {
-//     final dir = await getTemporaryDirectory();
-//     final path = '${dir.path}/$filename.png';
-//     final file = File(path);
-//     await file.writeAsBytes(bytes);
-//     return path;
-//   }
-//
-//   final refBytes = await imageToBytes(referenceImage);
-//   final userBytes = await imageToBytes(userImage);
-//   final refPath = await saveTemp(refBytes, 'reference');
-//   final userPath = await saveTemp(userBytes, 'user');
-//
-//   final refMat = Imgcodecs.imread(refPath, Imgcodecs.imgColor);
-//   final userMat = Imgcodecs.imread(userPath, Imgcodecs.imgColor);
-//
-//   final refGray = Mat.empty();
-//   final userGray = Mat.empty();
-//   Imgproc.cvtColor(refMat, refGray, Imgproc.colorBGR2GRAY);
-//   Imgproc.cvtColor(userMat, userGray, Imgproc.colorBGR2GRAY);
-//
-//   final refEdge = Mat.empty();
-//   final userEdge = Mat.empty();
-//   Imgproc.canny(refGray, refEdge, 50, 150);
-//   Imgproc.canny(userGray, userEdge, 50, 150);
-//
-//   final size = refEdge.size();
-//   final resizedUser = Mat.empty();
-//   Imgproc.resize(userEdge, resizedUser, size);
-//
-//   final diff = Core.norm(refEdge, resizedUser, Core.normL2);
-//   final max = size.width * size.height * 255;
-//   final similarity = (1.0 - (diff / max)).clamp(0.0, 1.0);
-//
-//   return similarity;
-// }
+
+Future<double> compareWithOpenCV(ui.Image referenceImage, ui.Image userImage) async {
+  Future<Uint8List> imageToBytes(ui.Image image) async {
+    final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+    return byteData!.buffer.asUint8List();
+  }
+
+  Future<String> saveTemp(Uint8List bytes, String filename) async {
+    final dir = await getTemporaryDirectory();
+    final path = '${dir.path}/$filename.png';
+    final file = File(path);
+    await file.writeAsBytes(bytes);
+    return path;
+  }
+
+  // 1. 이미지 → 바이트 → 파일로 저장
+  final refBytes = await imageToBytes(referenceImage);
+  final userBytes = await imageToBytes(userImage);
+  final refPath = await saveTemp(refBytes, 'reference');
+  final userPath = await saveTemp(userBytes, 'user');
+
+  // 2. 이미지 로드 (컬러로)
+  final refMat = cv.imread(refPath, flags: cv.IMREAD_COLOR);
+  final userMat = cv.imread(userPath, flags: cv.IMREAD_COLOR);
+
+  // 3. 그레이스케일 변환
+  final refGray = cv.cvtColor(refMat, cv.COLOR_BGR2GRAY);
+  final userGray = cv.cvtColor(userMat, cv.COLOR_BGR2GRAY);
+
+  // 4. Canny 엣지 감지
+  final refEdge = cv.canny(refGray, 50, 150);
+  final userEdge = cv.canny(userGray, 50, 150);
+
+  // 5. 사용자 이미지 크기 맞추기
+  final resizedUser = cv.resize(userEdge, (refEdge.size[0], refEdge.size[1]));
+
+  // 6. norm 비교 (L2 거리 → 유사도 계산)
+  final diff = cv.norm(refEdge, mask: resizedUser, normType: cv.NORM_L2);
+  final max = refEdge.size[0] * refEdge.size[1] * 255;
+  final similarity = (1.0 - (diff / max)).clamp(0.0, 1.0);
+
+  return similarity;
+}
