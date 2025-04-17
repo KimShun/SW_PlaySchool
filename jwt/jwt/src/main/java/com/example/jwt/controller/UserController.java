@@ -1,7 +1,9 @@
 package com.example.jwt.controller;
 
 import com.example.jwt.dto.*;
+import com.example.jwt.entity.GamePlay;
 import com.example.jwt.entity.User;
+import com.example.jwt.repository.GamePlayRepository;
 import com.example.jwt.repository.UserRepository;
 import com.example.jwt.security.JwtUtil;
 import com.example.jwt.service.AuthService;
@@ -24,6 +26,9 @@ public class UserController {
     private UserRepository userRepository;
 
     @Autowired
+    private GamePlayRepository gamePlayRepository;
+
+    @Autowired
     private AuthService authService;
 
     @Autowired
@@ -34,19 +39,21 @@ public class UserController {
     @PostMapping("/signup")
     public ResponseEntity<User> createUser(@Valid @RequestBody SignupRequestDto signupRequestDto) {
         User user = new User();
-
         user.setEmail(signupRequestDto.getEmail());
 
         String encoderPW = encoder.encode(signupRequestDto.getPassword());
         user.setPassword(encoderPW);
-
         user.setBirthDate(signupRequestDto.getBirthDate());
         user.setNickname(signupRequestDto.getNickname());
         user.setGender(signupRequestDto.getGender());
-
         user.setCreatedAt(LocalDateTime.now());
 
         User createdUser = userRepository.save(user);
+
+        GamePlay gamePlay = new GamePlay();
+        gamePlay.setUserUID(createdUser.getUserUID());
+        gamePlayRepository.save(gamePlay);
+
         return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
     }
 
