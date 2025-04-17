@@ -5,7 +5,7 @@ import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.UUID;
 
 @Entity
 @Getter
@@ -43,16 +43,18 @@ public class User {
     @Column(nullable = false)
     private boolean todayGame2 = false;
 
-    // 게임 이름별 플레이 횟수 저장용 Map
-    @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "user_game_count", joinColumns = @JoinColumn(name = "user_uid"))
-    @MapKeyColumn(name = "game_name")
-    @Column(name = "count")
-    private Map<String, Integer> countPerGame = new HashMap<>();
+    @Column(nullable = false)
+    private int exp = 0;
+
+    @Column(nullable = false)
+    private int level = 1;
+
+    @OneToOne
+    @JoinColumn(name = "userUID")
+    private GamePlay gamePlay;
 
     // UUID 자동 생성
     public User() {
         this.userUID = UUID.randomUUID().toString();
     }
-
 }
