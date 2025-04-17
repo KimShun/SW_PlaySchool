@@ -2,16 +2,17 @@ package com.example.jwt.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.UUID;
+import java.util.*;
 
 @Entity
 @Getter
 @Setter
 @AllArgsConstructor
 @Builder
-@Table(name = "users") // postgresql에서 "user"는 예약어
+@Table(name = "users")
 public class User {
 
     @Id
@@ -36,7 +37,22 @@ public class User {
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
+    @Column(nullable = false)
+    private boolean todayGame1 = false;
+
+    @Column(nullable = false)
+    private boolean todayGame2 = false;
+
+    // 게임 이름별 플레이 횟수 저장용 Map
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "user_game_count", joinColumns = @JoinColumn(name = "user_uid"))
+    @MapKeyColumn(name = "game_name")
+    @Column(name = "count")
+    private Map<String, Integer> countPerGame = new HashMap<>();
+
+    // UUID 자동 생성
     public User() {
         this.userUID = UUID.randomUUID().toString();
     }
+
 }
