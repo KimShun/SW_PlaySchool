@@ -1,5 +1,5 @@
-FROM openjdk:17
-RUN apt-get update && apt-get install -y xargs
+FROM openjdk:17-alpine
+RUN apk add --no-cache bash xargs
 WORKDIR /app
 COPY . /app
 RUN chmod +x gradlew
