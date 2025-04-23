@@ -1,5 +1,5 @@
 FROM openjdk:17-alpine
-RUN apk add --no-cache bash xargs
+RUN apk add --no-cache bash findutils
 WORKDIR /app
 COPY . /app
 RUN chmod +x gradlew
