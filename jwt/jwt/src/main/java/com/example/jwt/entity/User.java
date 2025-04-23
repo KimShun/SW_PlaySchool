@@ -38,16 +38,16 @@ public class User {
     private LocalDateTime createdAt;
 
     @Column(nullable = false)
-    private boolean todayGame1 = false;
+    private boolean todayGame1 ;
 
     @Column(nullable = false)
-    private boolean todayGame2 = false;
+    private boolean todayGame2;
 
     @Column(nullable = false)
-    private int exp = 0;
+    private int exp;
 
     @Column(nullable = false)
-    private int level = 1;
+    private int level;
 
     @OneToOne
     @JoinColumn(name = "userUID")
@@ -56,5 +56,9 @@ public class User {
     // UUID 자동 생성
     public User() {
         this.userUID = UUID.randomUUID().toString();
+        this.todayGame1 = false;
+        this.todayGame2 = false;
+        this.exp = 0;
+        this.level = 1;
     }
 }

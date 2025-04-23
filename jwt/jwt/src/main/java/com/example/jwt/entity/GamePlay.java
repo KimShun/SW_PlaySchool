@@ -6,7 +6,6 @@ import lombok.*;
 @Entity
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Table(name = "game_play")
@@ -16,17 +15,25 @@ public class GamePlay {
 
     // 게임별 플레이 횟수
     @Column(nullable = false)
-    private int wordGame = 0;
+    private int wordGame;
 
     @Column(nullable = false)
-    private int findWrongGame = 0;
+    private int findWrongGame;
 
     @Column(nullable = false)
-    private int danceGame = 0;
+    private int danceGame;
 
     @Column(nullable = false)
-    private int paintGame = 0;
+    private int paintGame;
 
     @Column(nullable = false)
-    private int makeBookGame = 0;
+    private int makeBookGame;
+
+    public GamePlay() {
+        this.wordGame = 0;
+        this.findWrongGame = 0;
+        this.danceGame = 0;
+        this.paintGame = 0;
+        this.makeBookGame = 0;
+    }
 }
