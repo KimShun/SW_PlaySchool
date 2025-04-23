@@ -1,4 +1,7 @@
 FROM openjdk:17
-COPY build/libs/jwt-0.0.1-SNAPSHOT.jar app.jar
-ENTRYPOINT ["java", "-jar", "/app.jar"]
+WORKDIR /app
+COPY ..
+RUN ./gradlew build --no-daemon
+EXPOSE 8080
+ENTRYPOINT ["java", "-jar", "build/libs/jwt-0.0.1-SNAPSHOT.jar"]
 
