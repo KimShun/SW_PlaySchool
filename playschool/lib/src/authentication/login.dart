@@ -1,8 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:playschool/src/authentication/cubit/authCubit.dart';
+import 'package:playschool/src/authentication/repository/AuthRepository.dart';
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
+
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+  final TextEditingController _emailTextController = TextEditingController();
+  final TextEditingController _passwordTextController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -78,6 +89,7 @@ class LoginScreen extends StatelessWidget {
                                     FractionallySizedBox(
                                       widthFactor: 0.85,
                                       child: TextField(
+                                        controller: _emailTextController,
                                         decoration: InputDecoration(
                                           prefixIcon:
                                           Icon(Icons.account_circle),
@@ -97,6 +109,7 @@ class LoginScreen extends StatelessWidget {
                                     FractionallySizedBox(
                                       widthFactor: 0.85,
                                       child: TextField(
+                                        controller: _passwordTextController,
                                         obscureText: true,
                                         decoration: InputDecoration(
                                           prefixIcon: Icon(Icons.lock),
@@ -143,7 +156,18 @@ class LoginScreen extends StatelessWidget {
 
                                     /// 로그인 버튼
                                     GestureDetector(
-                                      onTap: () => context.go('/'),
+                                      onTap: () async {
+                                        print(_emailTextController.text);
+                                        print(_passwordTextController.text);
+                                        await context.read<AuthRepository>().login(
+                                          _emailTextController.text,
+                                          _passwordTextController.text
+                                        );
+
+                                        if(context.read<AuthCubit>().state.authStatus == AuthStatus.complete) {
+                                          context.go("/");
+                                        }
+                                      },
                                       child: FractionallySizedBox(
                                         widthFactor: 0.85,
                                         child: Container(
