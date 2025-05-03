@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:playschool/src/authentication/cubit/authCubit.dart';
 import 'package:playschool/src/authentication/repository/AuthRepository.dart';
@@ -26,6 +27,7 @@ import 'src/games/fairyTale/fairyTaleList.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await initializeDateFormatting('ko', null); // 로케일 초기화
 
   final storage = await HydratedStorage.build(
       storageDirectory: HydratedStorageDirectory((await getApplicationDocumentsDirectory()).path)
@@ -47,7 +49,7 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MultiRepositoryProvider(
       providers: [
-        RepositoryProvider(create: (context) => AuthRepository(baseUrl: "https://sw-playschool.onrender.com")),
+        RepositoryProvider(create: (context) => const AuthRepository(baseUrl: "https://sw-playschool.onrender.com")),
       ],
       child: MultiBlocProvider(
         providers: [
@@ -55,11 +57,16 @@ class _MyAppState extends State<MyApp> {
           BlocProvider(create: (context) => PuzzleCubit()),
           BlocProvider(create: (context) => WordCubit()),
         ],
-        child: MaterialApp.router(
-          theme: ThemeData(
-            scaffoldBackgroundColor: BG_COLOR
+        child: BlocListener<AuthCubit, AuthState>(
+          listener: (context, state) {
+            _router.refresh();
+          },
+          child: MaterialApp.router(
+            theme: ThemeData(
+              scaffoldBackgroundColor: BG_COLOR
+            ),
+            routerConfig: _router,
           ),
-          routerConfig: _router,
         ),
       ),
     );
@@ -67,7 +74,15 @@ class _MyAppState extends State<MyApp> {
 }
 
 final GoRouter _router = GoRouter(
-  initialLocation: "/",
+  initialLocation: "/login",
+  // redirect: (context, state) {
+  //   final authState = context.read<AuthCubit>().state;
+  //   if (authState.authStatus == AuthStatus.complete && state.topRoute!.path == "/login") {
+  //     return "/";
+  //   }
+  //
+  //   return null;
+  // },
   routes: [
     GoRoute(
       path: "/",
@@ -133,6 +148,6 @@ final GoRouter _router = GoRouter(
         // return CompleteFairyTaleScreen(args: args!);
         return CompleteFairyTaleScreen();
       },
-    )
+    ),
   ]
 );

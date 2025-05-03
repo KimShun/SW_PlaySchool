@@ -2,14 +2,14 @@ import 'package:equatable/equatable.dart';
 import 'package:playschool/src/authentication/model/User.dart';
 
 import 'package:hydrated_bloc/hydrated_bloc.dart';
-import 'package:equatable/equatable.dart';
-import 'package:playschool/src/authentication/model/User.dart';
 import 'package:playschool/src/authentication/repository/AuthRepository.dart';
 
 class AuthCubit extends HydratedCubit<AuthState> {
   final AuthRepository authRepository;
 
-  AuthCubit({required this.authRepository}) : super(const AuthState());
+  AuthCubit({required this.authRepository}) : super(const AuthState()) {
+    _tryAutoLogin();
+  }
 
   Future<void> login(String email, String password) async {
     emit(state.copyWith(authStatus: AuthStatus.loading));
@@ -30,6 +30,21 @@ class AuthCubit extends HydratedCubit<AuthState> {
 
   void logout() {
     emit(const AuthState()); // 초기화
+  }
+
+  void _tryAutoLogin() async {
+    if(state.token != null) {
+      emit(state.copyWith(authStatus: AuthStatus.loading));
+
+      await authRepository.fetchUserInfo(state.token!).then((user) {
+        emit(state.copyWith(
+          authStatus: AuthStatus.complete,
+          userData: user
+        ));
+      }).catchError((_) {
+        emit(state.copyWith(authStatus: AuthStatus.error));
+      });
+    }
   }
 
   @override

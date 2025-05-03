@@ -1,13 +1,20 @@
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
 import 'package:linear_progress_bar/linear_progress_bar.dart';
 import 'package:playschool/src/common/component/color.dart';
+
+import '../authentication/cubit/authCubit.dart';
+import '../authentication/model/User.dart';
 
 class MyPageScreen extends StatelessWidget {
   const MyPageScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final userData = context.read<AuthCubit>().state.userData!;
+
     return Scaffold(
       extendBody: true,
       body: Stack(
@@ -21,9 +28,9 @@ class MyPageScreen extends StatelessWidget {
             child: Column(
               children: [
                 // Header 영역
-                _MyPageHeader(),
+                _MyPageHeader(userData: userData),
                 // Level 영역
-                _MyPageLevelPart(),
+                _MyPageLevelPart(userData: userData,),
                 // 경계선
                 Divider(
                   color: MYPAGE_STROKE_COLOR,
@@ -44,7 +51,12 @@ class MyPageScreen extends StatelessWidget {
 }
 
 class _MyPageHeader extends StatelessWidget {
-  const _MyPageHeader({super.key});
+  final User userData;
+
+  const _MyPageHeader({
+    super.key,
+    required this.userData,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -106,14 +118,15 @@ class _MyPageHeader extends StatelessWidget {
                           shape: BoxShape.circle,
                           border: Border.all(color: MYPAGE_STROKE_COLOR, width:1),
                         ),
-                        child: const CircleAvatar(
+                        child: CircleAvatar(
                           radius: 60,
-                          backgroundImage: AssetImage("assets/icon/IMG_3332.jpg"),
+                          backgroundImage: userData.gender == "여"
+                              ? const AssetImage("assets/icon/IMG_3332.jpg") : const AssetImage("assets/icon/IMG_3332 2.jpg"),
                         ),
                       ),
                       const SizedBox(height: 10),
-                      Text("아기토끼짱",
-                        style: TextStyle(
+                      Text(userData.nickname,
+                        style: const TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
                           fontSize: 25.0,
@@ -127,7 +140,7 @@ class _MyPageHeader extends StatelessWidget {
                             height: 52,
                           ),
                           const SizedBox(width: 10),
-                          Text("2001년 8월 18일",
+                          Text(DateFormat("yyyy년 M월 d일", "ko").format(userData.birthDate),
                             style: TextStyle(
                               color: Color(0xFF4A4A4A),
                               fontWeight: FontWeight.bold,
@@ -149,7 +162,12 @@ class _MyPageHeader extends StatelessWidget {
 }
 
 class _MyPageLevelPart extends StatelessWidget {
-  const _MyPageLevelPart({super.key});
+  final User userData;
+
+  const _MyPageLevelPart({
+    super.key,
+    required this.userData,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -200,14 +218,14 @@ class _MyPageLevelPart extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
-                          Text("Lv.1",
+                          Text("Lv.${userData.level}",
                             style: TextStyle(
                                 color: MYPAGE_STROKE_COLOR,
                                 fontWeight: FontWeight.bold,
                                 fontSize: 15.0
                             ),
                           ),
-                          Text("5 / 5",
+                          Text("${userData.exp} / 5",
                             style: TextStyle(
                                 color: MYPAGE_TEXT_S_COLOR,
                                 fontWeight: FontWeight.bold,
@@ -227,7 +245,7 @@ class _MyPageLevelPart extends StatelessWidget {
                       child: LinearProgressBar(
                         maxSteps: 5,
                         progressType: LinearProgressBar.progressTypeLinear,
-                        currentStep: 2,
+                        currentStep: userData.exp,
                         progressColor: MYPAGE_TEXT_S_COLOR,
                         backgroundColor: const Color(0xFFD9D9D9),
                         borderRadius: BorderRadius.circular(10),
@@ -235,7 +253,7 @@ class _MyPageLevelPart extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 3),
-                    Text("병아리~ 삐약! 삐약!",
+                    Text("너의 레벨을 보여줘~!!",
                       style: TextStyle(
                           color: TEXT_COLOR,
                           fontWeight: FontWeight.bold,

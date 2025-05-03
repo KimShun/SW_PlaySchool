@@ -22,10 +22,8 @@ class AuthRepository {
       }),
     );
 
-    print(response.body);
-
     if (response.statusCode == 200) {
-      final data = json.decode(response.body);
+      final data = json.decode(utf8.decode(response.bodyBytes));
       final token = data["token"];
       return token;
     } else {
@@ -42,14 +40,14 @@ class AuthRepository {
     );
 
     if (response.statusCode == 200) {
-      final data = json.decode(response.body);
+      final data = json.decode(utf8.decode(response.bodyBytes));
       return User.fromJson(data["user"]);
     } else {
       throw Exception("토큰이 유효하지 않습니다.");
     }
   }
 
-  Future<String> SignUp(String email, String password, String nickname, DateTime birthDate, String gender) async {
+  Future<String> SignUp(String email, String password, String nickname, String birthDate, String gender) async {
     final response = await http.post(
       Uri.parse("$baseUrl/api/auth/signup"),
       headers: {
@@ -59,7 +57,7 @@ class AuthRepository {
         "email" : email,
         "password" : password,
         "nickname" : nickname,
-        "birthDate" : birthDate.toString().split(" ").first,
+        "birthDate" : birthDate,
         "gender" : gender
       }),
     );

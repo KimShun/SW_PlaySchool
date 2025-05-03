@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:lottie/lottie.dart';
 import 'package:playschool/src/authentication/cubit/authCubit.dart';
 import 'package:playschool/src/authentication/repository/AuthRepository.dart';
+
+import '../common/component/color.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -92,7 +95,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                         controller: _emailTextController,
                                         decoration: InputDecoration(
                                           prefixIcon:
-                                          Icon(Icons.account_circle),
+                                          const Icon(Icons.account_circle),
                                           filled: true,
                                           fillColor: Colors.white,
                                           labelText: 'ID',
@@ -103,7 +106,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                         ),
                                       ),
                                     ),
-                                    SizedBox(height: 20),
+                                    const SizedBox(height: 20),
 
                                     /// Password
                                     FractionallySizedBox(
@@ -159,13 +162,17 @@ class _LoginScreenState extends State<LoginScreen> {
                                       onTap: () async {
                                         print(_emailTextController.text);
                                         print(_passwordTextController.text);
-                                        await context.read<AuthRepository>().login(
+                                        await context.read<AuthCubit>().login(
                                           _emailTextController.text,
                                           _passwordTextController.text
                                         );
 
+                                        print(context.read<AuthCubit>().state.authStatus);
+
                                         if(context.read<AuthCubit>().state.authStatus == AuthStatus.complete) {
                                           context.go("/");
+                                        } else if(context.read<AuthCubit>().state.authStatus == AuthStatus.error) {
+                                          _showFailedDialog(context);
                                         }
                                       },
                                       child: FractionallySizedBox(
@@ -173,11 +180,11 @@ class _LoginScreenState extends State<LoginScreen> {
                                         child: Container(
                                           height: 55,
                                           decoration: BoxDecoration(
-                                            color: Color(0xFFB386FF),
+                                            color: const Color(0xFFB386FF),
                                             borderRadius:
                                             BorderRadius.circular(20.0),
                                           ),
-                                          child: Center(
+                                          child: const Center(
                                             child: Text(
                                               "로그인",
                                               style: TextStyle(
@@ -216,6 +223,59 @@ class _LoginScreenState extends State<LoginScreen> {
           ],
         ),
       ),
+    );
+  }
+
+  void _showFailedDialog(BuildContext context) {
+    showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          Future.delayed(const Duration(seconds: 3), () {
+            if(Navigator.of(context).canPop()) {
+              Navigator.of(context).pop();
+            }
+          });
+
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16), // 모서리 둥글게
+            ),
+            backgroundColor: BG_COLOR,
+            content: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Lottie.asset("assets/lottie/failed.json",
+                  width: 150,
+                  height: 150,
+                ),
+                const SizedBox(height: 10),
+                Text(" 로그인 실패 ",
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 17,
+                      color: Y_TEXT_COLOR
+                  ),
+                ),
+                Text("힝.. 로그인에 실패했어...",
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 17,
+                      color: TEXT_COLOR
+                  ),
+                ),
+                Text("다시 시도해봐!!",
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 17,
+                      color: TEXT_COLOR
+                  ),
+                ),
+              ],
+            ),
+          );
+        }
     );
   }
 }

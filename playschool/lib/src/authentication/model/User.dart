@@ -42,7 +42,7 @@ class User {
       todayGame2: json['todayGame2'],
       exp: json['exp'],
       level: json['level'],
-      gamePlay: json['gamePlay'],
+      gamePlay: GamePlay.fromJson(json["gamePlay"]),
     );
   }
 
@@ -58,6 +58,7 @@ class User {
       'todayGame2': todayGame2,
       'exp': exp,
       'level': level,
+      'gamePlay': gamePlay,
     };
   }
 }
