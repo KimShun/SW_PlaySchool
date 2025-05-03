@@ -8,21 +8,21 @@ FairyTaleInfo dungeonWithDragon = FairyTaleInfo(
 FairyTaleInfo magicForest = FairyTaleInfo(
   iconPath: "assets/icon/forest.png",
   fiaryName: "마법의 숲",
-  fairySub: "",
+  fairySub: "마법의 숲에서 환상적인 일을 경험해봐~",
   settingsFairyTale: magicForestSetting,
 );
 
 FairyTaleInfo ocean = FairyTaleInfo(
   iconPath: "assets/icon/ocean.png",
   fiaryName: "바다 속 탐험",
-    fairySub: "",
+    fairySub: "너가 원하는 바다 속을 탐험해보자~",
   settingsFairyTale: oceanSetting
 );
 
 FairyTaleInfo spaceTrip = FairyTaleInfo(
   iconPath: "assets/icon/galaxy.png",
   fiaryName: "우주여행",
-  fairySub: "",
+  fairySub: "어디 행성을 여행해보고 싶어?",
   settingsFairyTale: spaceTripSetting,
 );
 
@@ -81,7 +81,7 @@ List<SettingInfo> oceanBgs = [
 ];
 
 SettingsFairyTale oceanSetting = SettingsFairyTale(
-    scene: "",
+    scene: "____(이)가 바다 속의 ____에서 ____를 하고 있어!",
     characters: oceanCharacters,
     actions: oceanActions,
     backgrounds: oceanBgs
@@ -98,7 +98,7 @@ List<SettingInfo> magicForestBgs = [
 ];
 
 SettingsFairyTale magicForestSetting = SettingsFairyTale(
-    scene: "",
+    scene: "____(이)가 마법이 가득한 숲에서 ____에서 ____를 하고 있어!",
     characters: magicForestCharacters,
     actions: magicForestActions,
     backgrounds: magicForestBgs
@@ -115,7 +115,7 @@ List<SettingInfo> spaceTripBgs = [
 ];
 
 SettingsFairyTale spaceTripSetting = SettingsFairyTale(
-    scene: "",
+    scene: "____(이)가 ____의 행성에서 ____를 하고 있어!",
     characters: spaceTripCharacters,
     actions: spaceTripActions,
     backgrounds: spaceTripBgs

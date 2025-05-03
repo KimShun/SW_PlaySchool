@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hydrated_bloc/hydrated_bloc.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:playschool/src/authentication/cubit/authCubit.dart';
+import 'package:playschool/src/authentication/repository/AuthRepository.dart';
 import 'package:playschool/src/common/component/color.dart';
 import 'package:playschool/src/common/detailGame/detailGame.dart';
 import 'package:playschool/src/common/detailGame/gameInfo.dart';
@@ -20,7 +24,14 @@ import 'package:playschool/src/authentication/login.dart';
 import 'package:playschool/src/authentication/signup.dart';
 import 'src/games/fairyTale/fairyTaleList.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  final storage = await HydratedStorage.build(
+      storageDirectory: HydratedStorageDirectory((await getApplicationDocumentsDirectory()).path)
+  );
+
+  HydratedBloc.storage = storage;
   runApp(const MyApp());
 }
 
@@ -34,16 +45,22 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
+    return MultiRepositoryProvider(
       providers: [
-        BlocProvider(create: (context) => PuzzleCubit()),
-        BlocProvider(create: (context) => WordCubit()),
+        RepositoryProvider(create: (context) => AuthRepository(baseUrl: "https://sw-playschool.onrender.com")),
       ],
-      child: MaterialApp.router(
-        theme: ThemeData(
-          scaffoldBackgroundColor: BG_COLOR
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider(create: (context) => AuthCubit(authRepository: context.read<AuthRepository>())),
+          BlocProvider(create: (context) => PuzzleCubit()),
+          BlocProvider(create: (context) => WordCubit()),
+        ],
+        child: MaterialApp.router(
+          theme: ThemeData(
+            scaffoldBackgroundColor: BG_COLOR
+          ),
+          routerConfig: _router,
         ),
-        routerConfig: _router,
       ),
     );
   }
