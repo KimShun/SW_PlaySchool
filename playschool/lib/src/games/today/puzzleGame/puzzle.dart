@@ -8,8 +8,20 @@ import 'package:playschool/src/games/repository/GameRepository.dart';
 
 import 'cubit/puzzleCubit.dart';
 
-class PuzzleGame extends StatelessWidget {
+class PuzzleGame extends StatefulWidget {
   const PuzzleGame({super.key});
+
+  @override
+  State<PuzzleGame> createState() => _PuzzleGameState();
+}
+
+class _PuzzleGameState extends State<PuzzleGame> {
+  @override
+  void didChangeDependencies() {
+    // TODO: implement didChangeDependencies
+    super.didChangeDependencies();
+    context.read<PuzzleCubit>().resumeBGM();
+  }
 
   @override
   Widget build(BuildContext context) {
