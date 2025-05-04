@@ -3,17 +3,33 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:playschool/src/authentication/cubit/authCubit.dart';
+import 'package:playschool/src/authentication/cubit/userCubit.dart';
 import 'package:playschool/src/common/component/color.dart';
 import 'package:playschool/src/common/detailGame/gameInfo.dart';
 
 import 'authentication/model/User.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
   @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
-    final userData = context.read<AuthCubit>().state.userData!;
+    return BlocListener<UserCubit, User?>(
+      listenWhen: (previous, current) => previous != current,
+      listener: (context, state) {
+        setState(() {});
+      },
+      child: _buildHomeScreen(context),
+    );
+  }
+
+  @override
+  Widget _buildHomeScreen(BuildContext context) {
+    final userData = context.read<UserCubit>().state!;
 
     bool hasSafeArea(BuildContext context) {
       final padding = MediaQuery.of(context).padding;

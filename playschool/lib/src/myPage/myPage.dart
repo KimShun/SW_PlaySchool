@@ -5,7 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:linear_progress_bar/linear_progress_bar.dart';
 import 'package:playschool/src/common/component/color.dart';
 
-import '../authentication/cubit/authCubit.dart';
+import '../authentication/cubit/userCubit.dart';
 import '../authentication/model/User.dart';
 
 class MyPageScreen extends StatelessWidget {
@@ -13,7 +13,7 @@ class MyPageScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final userData = context.read<AuthCubit>().state.userData!;
+    final userData = context.read<UserCubit>().state!;
 
     return Scaffold(
       extendBody: true,

@@ -32,6 +32,14 @@ class _LoginScreenState extends State<LoginScreen> {
             if (state.authStatus == AuthStatus.loading) {
               _showLoadingDialog(context);
             }
+
+            else if (state.authStatus == AuthStatus.error) {
+              if (Navigator.of(context).canPop()) {
+                Navigator.of(context).pop();
+              }
+              _showFailedDialog(context);
+            }
+
             else {
               if (Navigator.of(context).canPop()) {
                 Navigator.of(context).pop();
@@ -179,11 +187,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                           );
 
                                           print(context.read<AuthCubit>().state.authStatus);
-
                                           if(context.read<AuthCubit>().state.authStatus == AuthStatus.complete) {
                                             context.go("/");
-                                          } else if(context.read<AuthCubit>().state.authStatus == AuthStatus.error) {
-                                            _showFailedDialog(context);
                                           }
                                         },
                                         child: FractionallySizedBox(
@@ -221,7 +226,6 @@ class _LoginScreenState extends State<LoginScreen> {
                                     ),
                                   ),
                                 ),
-
                               ],
                             ),
                           ],

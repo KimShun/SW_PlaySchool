@@ -5,6 +5,7 @@ import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:playschool/src/authentication/cubit/authCubit.dart';
+import 'package:playschool/src/authentication/cubit/userCubit.dart';
 import 'package:playschool/src/authentication/repository/AuthRepository.dart';
 import 'package:playschool/src/common/component/color.dart';
 import 'package:playschool/src/common/detailGame/detailGame.dart';
@@ -15,6 +16,7 @@ import 'package:playschool/src/games/fairyTale/completeFairyTale.dart';
 import 'package:playschool/src/games/fairyTale/fairyTaleList.dart';
 import 'package:playschool/src/games/fairyTale/makeFairyTale.dart';
 import 'package:playschool/src/games/fairyTale/selectFairyTale.dart';
+import 'package:playschool/src/games/repository/GameRepository.dart';
 import 'package:playschool/src/games/today/puzzleGame/cubit/puzzleCubit.dart';
 import 'package:playschool/src/games/today/puzzleGame/puzzle.dart';
 import 'package:playschool/src/games/today/wordGame/cubit/wordCubit.dart';
@@ -45,15 +47,19 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  final baseUrl = "https://sw-playschool.onrender.com";
+
   @override
   Widget build(BuildContext context) {
     return MultiRepositoryProvider(
       providers: [
-        RepositoryProvider(create: (context) => const AuthRepository(baseUrl: "https://sw-playschool.onrender.com")),
+        RepositoryProvider(create: (context) => AuthRepository(baseUrl: baseUrl)),
+        RepositoryProvider(create: (context) => GameRepository(baseUrl: baseUrl))
       ],
       child: MultiBlocProvider(
         providers: [
-          BlocProvider(create: (context) => AuthCubit(authRepository: context.read<AuthRepository>())),
+          BlocProvider(create: (context) => UserCubit()),
+          BlocProvider(create: (context) => AuthCubit(userCubit: context.read<UserCubit>(), authRepository: context.read<AuthRepository>())),
           BlocProvider(create: (context) => PuzzleCubit()),
           BlocProvider(create: (context) => WordCubit()),
         ],

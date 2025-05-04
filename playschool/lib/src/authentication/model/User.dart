@@ -61,4 +61,34 @@ class User {
       'gamePlay': gamePlay,
     };
   }
+
+  User copyWith({
+    String? userUID,
+    String? email,
+    String? password,
+    String? nickname,
+    DateTime? birthDate,
+    String? gender,
+    String? createdAt,
+    bool? todayGame1,
+    bool? todayGame2,
+    int? exp,
+    int? level,
+    GamePlay? gamePlay,
+  }) {
+    return User(
+      userUID: userUID ?? this.userUID,
+      email: email ?? this.email,
+      password: password ?? this.password,
+      nickname: nickname ?? this.nickname,
+      birthDate: birthDate ?? this.birthDate,
+      gender: gender ?? this.gender,
+      createdAt: createdAt ?? this.createdAt,
+      todayGame1: todayGame1 ?? this.todayGame1,
+      todayGame2: todayGame2 ?? this.todayGame2,
+      exp: exp ?? this.exp,
+      level: level ?? this.level,
+      gamePlay: gamePlay ?? this.gamePlay,
+    );
+  }
 }

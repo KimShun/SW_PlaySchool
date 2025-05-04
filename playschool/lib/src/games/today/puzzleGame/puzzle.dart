@@ -2,7 +2,9 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lottie/lottie.dart';
+import 'package:playschool/src/authentication/cubit/authCubit.dart';
 import 'package:playschool/src/common/component/color.dart';
+import 'package:playschool/src/games/repository/GameRepository.dart';
 
 import 'cubit/puzzleCubit.dart';
 
@@ -14,9 +16,10 @@ class PuzzleGame extends StatelessWidget {
     return Scaffold(
       extendBody: true,
       body: BlocListener<PuzzleCubit, PuzzleState>(
-        listener: (context, state) {
+        listener: (context, state) async {
           if (state.status == PuzzleStatus.completed) {
             _showVictoryDialog(context);
+            await context.read<GameRepository>().updateTodayGame(context, 1, context.read<AuthCubit>().state.token!);
           }
         },
         child: BlocBuilder<PuzzleCubit, PuzzleState>(
