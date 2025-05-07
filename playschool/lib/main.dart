@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:playschool/src/authentication/cubit/authCubit.dart';
+import 'package:playschool/src/authentication/cubit/userCubit.dart';
 import 'package:playschool/src/authentication/repository/AuthRepository.dart';
 import 'package:playschool/src/common/component/color.dart';
 import 'package:playschool/src/common/detailGame/detailGame.dart';
@@ -14,6 +16,7 @@ import 'package:playschool/src/games/fairyTale/completeFairyTale.dart';
 import 'package:playschool/src/games/fairyTale/fairyTaleList.dart';
 import 'package:playschool/src/games/fairyTale/makeFairyTale.dart';
 import 'package:playschool/src/games/fairyTale/selectFairyTale.dart';
+import 'package:playschool/src/games/repository/GameRepository.dart';
 import 'package:playschool/src/games/today/puzzleGame/cubit/puzzleCubit.dart';
 import 'package:playschool/src/games/today/puzzleGame/puzzle.dart';
 import 'package:playschool/src/games/today/wordGame/cubit/wordCubit.dart';
@@ -26,6 +29,7 @@ import 'src/games/fairyTale/fairyTaleList.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await initializeDateFormatting('ko', null); // 로케일 초기화
 
   final storage = await HydratedStorage.build(
       storageDirectory: HydratedStorageDirectory((await getApplicationDocumentsDirectory()).path)
@@ -43,23 +47,32 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  final baseUrl = "https://sw-playschool.onrender.com";
+
   @override
   Widget build(BuildContext context) {
     return MultiRepositoryProvider(
       providers: [
-        RepositoryProvider(create: (context) => AuthRepository(baseUrl: "https://sw-playschool.onrender.com")),
+        RepositoryProvider(create: (context) => AuthRepository(baseUrl: baseUrl)),
+        RepositoryProvider(create: (context) => GameRepository(baseUrl: baseUrl))
       ],
       child: MultiBlocProvider(
         providers: [
-          BlocProvider(create: (context) => AuthCubit(authRepository: context.read<AuthRepository>())),
+          BlocProvider(create: (context) => UserCubit()),
+          BlocProvider(create: (context) => AuthCubit(userCubit: context.read<UserCubit>(), authRepository: context.read<AuthRepository>())),
           BlocProvider(create: (context) => PuzzleCubit()),
           BlocProvider(create: (context) => WordCubit()),
         ],
-        child: MaterialApp.router(
-          theme: ThemeData(
-            scaffoldBackgroundColor: BG_COLOR
+        child: BlocListener<AuthCubit, AuthState>(
+          listener: (context, state) {
+            _router.refresh();
+          },
+          child: MaterialApp.router(
+            theme: ThemeData(
+              scaffoldBackgroundColor: BG_COLOR
+            ),
+            routerConfig: _router,
           ),
-          routerConfig: _router,
         ),
       ),
     );
@@ -67,7 +80,15 @@ class _MyAppState extends State<MyApp> {
 }
 
 final GoRouter _router = GoRouter(
-  initialLocation: "/",
+  initialLocation: "/login",
+  // redirect: (context, state) {
+  //   final authState = context.read<AuthCubit>().state;
+  //   if (authState.authStatus == AuthStatus.complete && state.topRoute!.path == "/login") {
+  //     return "/";
+  //   }
+  //
+  //   return null;
+  // },
   routes: [
     GoRoute(
       path: "/",
@@ -133,6 +154,6 @@ final GoRouter _router = GoRouter(
         // return CompleteFairyTaleScreen(args: args!);
         return CompleteFairyTaleScreen();
       },
-    )
+    ),
   ]
 );

@@ -15,12 +15,22 @@ class PuzzleCubit extends Cubit<PuzzleState> {
   final AudioPlayer _player = AudioPlayer();
 
   PuzzleCubit() : super(PuzzleState()) {
-    playBGM();
+    loadBGM();
     loadImageUrl();
   }
 
+  void resumeBGM() async {
+    if(_player.state == PlayerState.paused && state.isBGMPlaying == false) {
+      await _player.resume();
+      emit(state.copyWith(isBGMPlaying: true));
+    }
+  }
+
   void pauseBGM() async {
-    await _player.dispose();
+    if (_player.state == PlayerState.playing && state.isBGMPlaying == true) {
+      await _player.pause();
+      emit(state.copyWith(isBGMPlaying: false));
+    }
   }
 
   void puzzleDone() {
@@ -40,13 +50,12 @@ class PuzzleCubit extends Cubit<PuzzleState> {
     }
   }
 
-  void playBGM() async {
+  void loadBGM() async {
+    await _player.setSourceAsset("bgm/puzzleBGM.mp3");
     await _player.setReleaseMode(ReleaseMode.loop);
-    await _player.play(AssetSource("bgm/puzzleBGM.mp3"));
-  }
+    await _player.resume();
 
-  void playPause() {
-    _player.dispose();
+    emit(state.copyWith(isBGMPlaying: true));
   }
 
   Future<void> loadImageUrl() async {
@@ -137,6 +146,7 @@ class PuzzleState extends Equatable {
   final Map<int, bool>? placedPieces;
   final Map<int, int>? answerMapping;
   final String? error;
+  final bool? isBGMPlaying;
 
   const PuzzleState({
     this.status = PuzzleStatus.init,
@@ -144,7 +154,8 @@ class PuzzleState extends Equatable {
     this.imagePieces = const [],
     this.placedPieces = const {},
     this.answerMapping = const {},
-    this.error
+    this.error,
+    this.isBGMPlaying = false,
   });
 
   PuzzleState copyWith({
@@ -154,6 +165,7 @@ class PuzzleState extends Equatable {
     Map<int, bool>? placedPieces,
     Map<int, int>? answerMapping,
     String? error,
+    bool? isBGMPlaying,
   }) {
     return PuzzleState(
       status: status ?? this.status,
@@ -161,11 +173,12 @@ class PuzzleState extends Equatable {
       imagePieces: imagePieces ?? this.imagePieces,
       placedPieces: placedPieces ?? this.placedPieces,
       answerMapping: answerMapping ?? this.answerMapping,
-      error: error ?? this.error
+      error: error ?? this.error,
+      isBGMPlaying: isBGMPlaying ?? this.isBGMPlaying,
     );
   }
 
   @override
   // TODO: implement props
-  List<Object?> get props => [status, image, imagePieces, placedPieces, answerMapping, error];
+  List<Object?> get props => [status, image, imagePieces, placedPieces, answerMapping, error, isBGMPlaying];
 }

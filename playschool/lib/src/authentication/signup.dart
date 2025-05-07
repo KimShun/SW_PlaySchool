@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:playschool/src/authentication/repository/AuthRepository.dart';
 
 // 포커스 상태에 따라 label과 hint를 바꾸는 커스텀 텍스트 필드 위젯
 class CustomTextField extends StatefulWidget {
@@ -170,7 +172,7 @@ class _SignupScreenState extends State<SignupScreen> {
             elevation: 10,
             items: [
               DropdownMenuItem(
-                value: "여자",
+                value: "여",
                 child: Padding(
                   padding: EdgeInsets.only(left: 20),
                   child: Text(
@@ -180,7 +182,7 @@ class _SignupScreenState extends State<SignupScreen> {
                 ),
               ),
               DropdownMenuItem(
-                value: "남자",
+                value: "남",
                 child: Padding(
                   padding: EdgeInsets.only(left: 20),
                   child: Text(
@@ -201,14 +203,6 @@ class _SignupScreenState extends State<SignupScreen> {
       ),
     );
   }
-
-
-
-
-
-
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -265,17 +259,17 @@ class _SignupScreenState extends State<SignupScreen> {
                       ],
                     ),
 
-                    // 생일 필드: 숫자와 '.'만 입력 가능, 형식 예: 02.12.13
+                    // 생일 필드: 숫자와 '-'만 입력 가능, 형식 예: 2002-12-13
                     CustomTextField(
-                      hintText: "생일 - 02.12.13",
+                      hintText: "생일 - 2002-12-13",
                       labelText: "생일",
                       controller: _birthdayController,
                       keyboardType: TextInputType.number,
                       inputFormatters: [
                         FilteringTextInputFormatter.allow(
-
-                          RegExp(r'[\d.]'),
+                          RegExp(r'[\d-]'),
                         ),
+                        LengthLimitingTextInputFormatter(10),
                       ],
                     ),
 
@@ -301,9 +295,19 @@ class _SignupScreenState extends State<SignupScreen> {
 
                     // 버튼: 모든 필드가 채워졌을 때만 활성화
                     GestureDetector(
-                      onTap: () {
+                      onTap: () async {
                         if (isButtonEnabled) {
-                          context.go('/login');
+                          final response = await context.read<AuthRepository>().SignUp(
+                            _idController.text,
+                            _passwordController.text,
+                            _nicknameController.text,
+                            _birthdayController.text,
+                            _selectedGender!
+                          );
+
+                          if (response == "회원가입 성공") {
+                            context.go("/login");
+                          }
                         }
                       },
                       child: Container(

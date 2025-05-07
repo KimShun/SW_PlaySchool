@@ -2,21 +2,36 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lottie/lottie.dart';
+import 'package:playschool/src/authentication/cubit/authCubit.dart';
 import 'package:playschool/src/common/component/color.dart';
+import 'package:playschool/src/games/repository/GameRepository.dart';
 
 import 'cubit/puzzleCubit.dart';
 
-class PuzzleGame extends StatelessWidget {
+class PuzzleGame extends StatefulWidget {
   const PuzzleGame({super.key});
+
+  @override
+  State<PuzzleGame> createState() => _PuzzleGameState();
+}
+
+class _PuzzleGameState extends State<PuzzleGame> {
+  @override
+  void didChangeDependencies() {
+    // TODO: implement didChangeDependencies
+    super.didChangeDependencies();
+    context.read<PuzzleCubit>().resumeBGM();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       extendBody: true,
       body: BlocListener<PuzzleCubit, PuzzleState>(
-        listener: (context, state) {
+        listener: (context, state) async {
           if (state.status == PuzzleStatus.completed) {
             _showVictoryDialog(context);
+            await context.read<GameRepository>().updateTodayGame(context, 1, context.read<AuthCubit>().state.token!);
           }
         },
         child: BlocBuilder<PuzzleCubit, PuzzleState>(

@@ -1,14 +1,36 @@
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:playschool/src/authentication/cubit/authCubit.dart';
+import 'package:playschool/src/authentication/cubit/userCubit.dart';
 import 'package:playschool/src/common/component/color.dart';
 import 'package:playschool/src/common/detailGame/gameInfo.dart';
 
-class HomeScreen extends StatelessWidget {
+import 'authentication/model/User.dart';
+
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
   @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
+    return BlocListener<UserCubit, User?>(
+      listenWhen: (previous, current) => previous != current,
+      listener: (context, state) {
+        setState(() {});
+      },
+      child: _buildHomeScreen(context),
+    );
+  }
+
+  @override
+  Widget _buildHomeScreen(BuildContext context) {
+    final userData = context.read<UserCubit>().state!;
+
     bool hasSafeArea(BuildContext context) {
       final padding = MediaQuery.of(context).padding;
       return padding.top > 20;
@@ -42,11 +64,11 @@ class HomeScreen extends StatelessWidget {
                       child: SafeArea(
                         child: Padding(
                           padding: EdgeInsets.only(top: 10.0, bottom: needsSafeArea ? 0 : 30),
-                          child: const Column(
+                          child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              _mainHeaderTop(),
-                              _mainHeaderBottom(),
+                              _mainHeaderTop(userData: userData),
+                              _mainHeaderBottom(userData: userData),
                             ],
                           ),
                         ),
@@ -54,22 +76,24 @@ class HomeScreen extends StatelessWidget {
                     ),
 
                     // 클리어 시에 메달 아이콘 표시
-                    Positioned(
-                      left: MediaQuery.of(context).size.width * 0.30,
-                      bottom: MediaQuery.of(context).size.width * 0.025,
-                      child: Image.asset("assets/icon/award.png",
-                        width: 45,
-                        height: 45,
-                      )
-                    ),
-                    Positioned(
-                      right: MediaQuery.of(context).size.width * 0.13,
-                      bottom: MediaQuery.of(context).size.width * 0.025,
-                      child: Image.asset("assets/icon/award.png",
-                        width: 45,
-                        height: 45,
-                      )
-                    ),
+                    if(userData.todayGame1 == true)
+                      Positioned(
+                        left: MediaQuery.of(context).size.width * 0.30,
+                        bottom: MediaQuery.of(context).size.width * 0.025,
+                        child: Image.asset("assets/icon/award.png",
+                          width: 45,
+                          height: 45,
+                        )
+                      ),
+                    if(userData.todayGame2 == true)
+                      Positioned(
+                        right: MediaQuery.of(context).size.width * 0.13,
+                        bottom: MediaQuery.of(context).size.width * 0.025,
+                        child: Image.asset("assets/icon/award.png",
+                          width: 45,
+                          height: 45,
+                        )
+                      ),
                   ]
                 ),
 
@@ -269,7 +293,12 @@ class HomeScreen extends StatelessWidget {
 }
 
 class _mainHeaderTop extends StatelessWidget {
-  const _mainHeaderTop({super.key});
+  final User userData;
+
+  const _mainHeaderTop({
+    super.key,
+    required this.userData,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -289,9 +318,10 @@ class _mainHeaderTop extends StatelessWidget {
                     shape: BoxShape.circle,
                     border: Border.all(color: Y_STROKE_COLOR, width:1),
                   ),
-                  child: const CircleAvatar(
+                  child: CircleAvatar(
                       radius: 33,
-                      backgroundImage: AssetImage("assets/icon/IMG_3332.jpg")
+                      backgroundImage: userData.gender == "여"
+                          ? const AssetImage("assets/icon/IMG_3332.jpg") : const AssetImage("assets/icon/IMG_3332 2.jpg")
                   ),
                 ),
               ),
@@ -299,7 +329,7 @@ class _mainHeaderTop extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text("아기토끼짱",
+                  Text(userData.nickname,
                     style: TextStyle(
                         color: Y_TEXT_COLOR,
                         fontSize: 15.0,
@@ -325,7 +355,12 @@ class _mainHeaderTop extends StatelessWidget {
 }
 
 class _mainHeaderBottom extends StatelessWidget {
-  const _mainHeaderBottom({super.key});
+  final User userData;
+
+  const _mainHeaderBottom({
+    super.key,
+    required this.userData,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -358,12 +393,35 @@ class _mainHeaderBottom extends StatelessWidget {
                   color: Y_STROKE_COLOR,
                   borderType: BorderType.RRect,
                   radius: const Radius.circular(20),
-                  child: Container(
-                    width: 132,
-                    height: 89,
-                    decoration: BoxDecoration(
-                        color: PLAY_CARD_COLOR,
-                        borderRadius: BorderRadius.circular(20)
+                  child: GestureDetector(
+                    onTap: () {
+                      context.push("/puzzleGame");
+                    },
+                    child: Container(
+                      width: 132,
+                      height: 89,
+                      decoration: BoxDecoration(
+                          color: PLAY_CARD_COLOR,
+                          borderRadius: BorderRadius.circular(20)
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Text("퍼즐 맞추기",
+                            style: TextStyle(
+                              color: Y_TEXT_COLOR,
+                              fontSize: 15.0,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 5.0),
+                          Image.asset("assets/icon/childHappy.png",
+                            width: 45,
+                            height: 45,
+                          )
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -375,12 +433,47 @@ class _mainHeaderBottom extends StatelessWidget {
                   color: Y_STROKE_COLOR,
                   borderType: BorderType.RRect,
                   radius: const Radius.circular(20),
-                  child: Container(
-                    width: 132,
-                    height: 89,
-                    decoration: BoxDecoration(
-                        color: PLAY_CARD_COLOR,
-                        borderRadius: BorderRadius.circular(20)
+                  child: GestureDetector(
+                    onTap: () {
+                      // context.push();
+                    },
+                    child: Container(
+                      width: 132,
+                      height: 89,
+                      decoration: BoxDecoration(
+                          color: PLAY_CARD_COLOR,
+                          borderRadius: BorderRadius.circular(20)
+                      ),
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Text("단어 맞추기",
+                                style: TextStyle(
+                                  color: Y_TEXT_COLOR,
+                                  fontSize: 15.0,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(height: 5.0),
+                              Image.asset("assets/icon/childHappy2.png",
+                                width: 45,
+                                height: 45,
+                              )
+                            ],
+                          ),
+                          if(!userData.todayGame1)
+                            Container(
+                              decoration: BoxDecoration(
+                                  color: Colors.grey.withOpacity(0.5),
+                                  borderRadius: BorderRadius.circular(20)
+                              ),
+                            )
+                        ],
+                      ),
                     ),
                   ),
                 ),
