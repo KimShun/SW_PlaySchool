@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:playschool/src/games/fairyTale/fairyTaleList.dart';
+import 'package:playschool/src/games/fairyTale/repository/fairyTaleList.dart';
 
 import '../../common/component/color.dart';
 import '../../common/detailGame/gameInfo.dart';

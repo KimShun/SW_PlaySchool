@@ -2,7 +2,7 @@ import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lottie/lottie.dart';
-import 'package:playschool/src/games/fairyTale/fairyTaleList.dart';
+import 'package:playschool/src/games/fairyTale/repository/fairyTaleList.dart';
 
 import '../../common/component/color.dart';
 

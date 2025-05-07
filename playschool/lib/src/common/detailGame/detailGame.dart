@@ -198,7 +198,7 @@ class _detailButtons extends StatelessWidget {
                     "그림 그리기": "/drawingGame",
                     "단어 맞추기": "",
                     "틀린그림찾기": "",
-                    "율동 따라하기": "",
+                    "율동 따라하기": "/selectDance",
                     "동화책 만들기": "/makeFairyTaleBook",
                   };
 

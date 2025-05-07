@@ -10,10 +10,12 @@ import 'package:playschool/src/authentication/repository/AuthRepository.dart';
 import 'package:playschool/src/common/component/color.dart';
 import 'package:playschool/src/common/detailGame/detailGame.dart';
 import 'package:playschool/src/common/detailGame/gameInfo.dart';
+import 'package:playschool/src/games/dance/cubit/danceCubit.dart';
+import 'package:playschool/src/games/dance/selectDance.dart';
 import 'package:playschool/src/games/drawing/drawingGame.dart';
 import 'package:playschool/src/games/drawing/drawingdetail.dart';
 import 'package:playschool/src/games/fairyTale/completeFairyTale.dart';
-import 'package:playschool/src/games/fairyTale/fairyTaleList.dart';
+import 'package:playschool/src/games/fairyTale/repository/fairyTaleList.dart';
 import 'package:playschool/src/games/fairyTale/makeFairyTale.dart';
 import 'package:playschool/src/games/fairyTale/selectFairyTale.dart';
 import 'package:playschool/src/games/repository/GameRepository.dart';
@@ -25,7 +27,7 @@ import 'package:playschool/src/home.dart';
 import 'package:playschool/src/myPage/myPage.dart';
 import 'package:playschool/src/authentication/login.dart';
 import 'package:playschool/src/authentication/signup.dart';
-import 'src/games/fairyTale/fairyTaleList.dart';
+import 'src/games/fairyTale/repository/fairyTaleList.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -62,6 +64,7 @@ class _MyAppState extends State<MyApp> {
           BlocProvider(create: (context) => AuthCubit(userCubit: context.read<UserCubit>(), authRepository: context.read<AuthRepository>())),
           BlocProvider(create: (context) => PuzzleCubit()),
           BlocProvider(create: (context) => WordCubit()),
+          BlocProvider(create: (context) => DanceCubit()),
         ],
         child: BlocListener<AuthCubit, AuthState>(
           listener: (context, state) {
@@ -81,14 +84,14 @@ class _MyAppState extends State<MyApp> {
 
 final GoRouter _router = GoRouter(
   initialLocation: "/login",
-  // redirect: (context, state) {
-  //   final authState = context.read<AuthCubit>().state;
-  //   if (authState.authStatus == AuthStatus.complete && state.topRoute!.path == "/login") {
-  //     return "/";
-  //   }
-  //
-  //   return null;
-  // },
+  redirect: (context, state) {
+    final authState = context.read<AuthCubit>().state;
+    if (authState.authStatus == AuthStatus.complete && state.topRoute!.path == "/login") {
+      return "/";
+    }
+
+    return null;
+  },
   routes: [
     GoRoute(
       path: "/",
@@ -155,5 +158,12 @@ final GoRouter _router = GoRouter(
         return CompleteFairyTaleScreen();
       },
     ),
+    GoRoute(
+      path: "/selectDance",
+      builder: (context, state) {
+        final gameData = state.extra as GameData?;
+        return SelectDanceScreen(gameData: gameData!);
+      }
+    )
   ]
 );
