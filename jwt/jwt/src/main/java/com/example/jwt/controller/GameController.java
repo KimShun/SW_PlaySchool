@@ -1,5 +1,6 @@
 package com.example.jwt.controller;
 
+import com.example.jwt.entity.GamePlay;
 import com.example.jwt.entity.User;
 import com.example.jwt.repository.UserRepository;
 import com.example.jwt.security.JwtUtil;
@@ -24,9 +25,7 @@ public class GameController {
 
     @PatchMapping("/todayclear")
     @Transactional
-    public ResponseEntity<?> clearGame(
-            @RequestHeader("Authorization") String token,
-            @RequestParam int selectToday) {
+    public ResponseEntity<?> clearGame(@RequestHeader("Authorization") String token, @RequestParam int selectToday) {
 
         String jwtToken = token.substring(7);
         boolean isValid = jwtUtil.validateToken(jwtToken);
@@ -44,4 +43,33 @@ public class GameController {
 
         return ResponseEntity.ok("게임 클리어 상태가 업데이트되었습니다.");
     }
+
+
+    @PatchMapping("/gameupdate")
+    @Transactional
+    public ResponseEntity<?> gameupdate(@RequestHeader("Authorization") String token, @RequestParam int gameNumber) {
+        String jwtToken = token.substring(7);
+        boolean isValid = jwtUtil.validateToken(jwtToken);
+        String message = isValid ? "토큰이 유효합니다" : "토큰이 유효하지 않습니다";
+
+        User user = authService.getUserByToken(jwtToken);
+
+        if (gameNumber == 1) {
+            user.getGamePlay().setWordGame(user.getGamePlay().getWordGame() + 1);
+        } else if (gameNumber == 2) {
+            user.getGamePlay().setFindWrongGame(user.getGamePlay().getFindWrongGame() + 1);
+        } else if (gameNumber == 3) {
+            user.getGamePlay().setDanceGame(user.getGamePlay().getDanceGame() + 1);
+        } else if (gameNumber == 4) {
+            user.getGamePlay().setPaintGame(user.getGamePlay().getPaintGame() + 1);
+        } else if (gameNumber == 5) {
+            user.getGamePlay().setMakeBookGame(user.getGamePlay().getMakeBookGame() + 1);
+        } else {
+            return ResponseEntity.badRequest().body("올바른 게임 번호(1~5)를 입력해주세요.");
+        }
+
+        return ResponseEntity.ok("게임 클리어 횟수가 업데이트되었습니다.");
+    }
 }
+
+

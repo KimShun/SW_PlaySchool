@@ -10,6 +10,7 @@ import lombok.*;
 @Builder
 @Table(name = "game_play")
 public class GamePlay {
+
     @Id
     private String userUID;
 

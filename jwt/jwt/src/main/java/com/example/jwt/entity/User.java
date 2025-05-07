@@ -1,6 +1,7 @@
 package com.example.jwt.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Max;
 import lombok.*;
 
 import java.time.LocalDate;
