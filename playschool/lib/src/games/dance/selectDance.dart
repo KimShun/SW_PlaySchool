@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:playschool/src/games/dance/cubit/danceCubit.dart';
 import 'package:playschool/src/games/dance/repository/danceList.dart';
 import 'package:video_player/video_player.dart';
 
 import '../../common/component/color.dart';
 import '../../common/detailGame/gameInfo.dart';
+import 'cubit/danceCubit.dart';
+import 'cubit/popUpDanceCubit.dart';
 
 class SelectDanceScreen extends StatelessWidget {
   final GameData gameData;
@@ -100,11 +101,11 @@ class _SelectDanceHeader extends StatelessWidget {
                   const SizedBox(height: 20),
                   Text("신나게 춤을 따라해보자!",
                     style: TextStyle(
-                        color: gameData.gameType == GameType.play
-                            ? Y_TEXT_COLOR : gameData.gameType == GameType.ent
-                            ? EXERCISE_TEXT_COLOR : MAKE_TEXT_COLOR,
-                        fontSize: 22.0,
-                        fontWeight: FontWeight.bold
+                      color: gameData.gameType == GameType.play
+                          ? Y_TEXT_COLOR : gameData.gameType == GameType.ent
+                          ? EXERCISE_TEXT_COLOR : MAKE_TEXT_COLOR,
+                      fontSize: 22.0,
+                      fontWeight: FontWeight.bold
                     ),
                   )
                 ],
@@ -165,10 +166,10 @@ class _danceListPart extends StatelessWidget {
                 itemBuilder: (context, index) {
                   return GestureDetector(
                     onTap: () async {
-                      await context.read<DanceCubit>().loadVideo(danceList[index].videoPath);
+                      await context.read<PopDanceCubit>().loadVideo(danceList[index].videoPath);
                       bool? check = await _showCheckDialog(context, danceList[index].danceName, danceList[index].videoPath, danceList[index].copyRight);
 
-                      if (check == true) {
+                      if (check! == true) {
                         context.push("/playDance", extra: danceList[index]);
                       }
                     },
@@ -242,7 +243,7 @@ class _danceListPart extends StatelessWidget {
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(20),
                 ),
-                child: VideoPlayer(context.read<DanceCubit>().state.videoController!),
+                child: VideoPlayer(context.read<PopDanceCubit>().state.videoController!),
               ),
               const SizedBox(height: 20),
               Text(danceName,
@@ -272,14 +273,17 @@ class _danceListPart extends StatelessWidget {
           actions: [
             TextButton(
               onPressed: () {
-                context.read<DanceCubit>().videoDispose();
+                context.read<PopDanceCubit>().videoDispose();
                 Navigator.of(context).pop(false);
               },
-              child: Text("취소", style: TextStyle(color: Colors.grey)),
+              child: const Text("취소", style: TextStyle(color: Colors.grey)),
             ),
             TextButton(
-              onPressed: () => Navigator.of(context).pop(true),
-              child: Text("확인", style: TextStyle(color: Colors.green)),
+              onPressed: () {
+                context.read<PopDanceCubit>().videoDispose();
+                Navigator.of(context).pop(true);
+              },
+              child: const Text("확인", style: TextStyle(color: Colors.green)),
             ),
           ],
         );
@@ -315,7 +319,9 @@ class _SelfDancePart extends StatelessWidget {
           ),
           const SizedBox(height: 15.0),
           GestureDetector(
-            onTap: () {},
+            onTap: () {
+              context.read<DanceCubit>().startCountdown();
+            },
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [

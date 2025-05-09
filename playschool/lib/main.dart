@@ -10,7 +10,12 @@ import 'package:playschool/src/authentication/repository/AuthRepository.dart';
 import 'package:playschool/src/common/component/color.dart';
 import 'package:playschool/src/common/detailGame/detailGame.dart';
 import 'package:playschool/src/common/detailGame/gameInfo.dart';
+import 'package:playschool/src/common/permission.dart';
+import 'package:playschool/src/games/dance/completeDance.dart';
 import 'package:playschool/src/games/dance/cubit/danceCubit.dart';
+import 'package:playschool/src/games/dance/cubit/popUpDanceCubit.dart';
+import 'package:playschool/src/games/dance/playDance.dart';
+import 'package:playschool/src/games/dance/repository/danceList.dart';
 import 'package:playschool/src/games/dance/selectDance.dart';
 import 'package:playschool/src/games/drawing/drawingGame.dart';
 import 'package:playschool/src/games/drawing/drawingdetail.dart';
@@ -27,11 +32,11 @@ import 'package:playschool/src/home.dart';
 import 'package:playschool/src/myPage/myPage.dart';
 import 'package:playschool/src/authentication/login.dart';
 import 'package:playschool/src/authentication/signup.dart';
-import 'src/games/fairyTale/repository/fairyTaleList.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initializeDateFormatting('ko', null); // 로케일 초기화
+  await requestPermission(); // 권한 접근
 
   final storage = await HydratedStorage.build(
       storageDirectory: HydratedStorageDirectory((await getApplicationDocumentsDirectory()).path)
@@ -56,7 +61,8 @@ class _MyAppState extends State<MyApp> {
     return MultiRepositoryProvider(
       providers: [
         RepositoryProvider(create: (context) => AuthRepository(baseUrl: baseUrl)),
-        RepositoryProvider(create: (context) => GameRepository(baseUrl: baseUrl))
+        RepositoryProvider(create: (context) => GameRepository(baseUrl: baseUrl)),
+        // RepositoryProvider(create: (context) => DanceRepository()),
       ],
       child: MultiBlocProvider(
         providers: [
@@ -64,6 +70,7 @@ class _MyAppState extends State<MyApp> {
           BlocProvider(create: (context) => AuthCubit(userCubit: context.read<UserCubit>(), authRepository: context.read<AuthRepository>())),
           BlocProvider(create: (context) => PuzzleCubit()),
           BlocProvider(create: (context) => WordCubit()),
+          BlocProvider(create: (context) => PopDanceCubit()),
           BlocProvider(create: (context) => DanceCubit()),
         ],
         child: BlocListener<AuthCubit, AuthState>(
@@ -83,7 +90,7 @@ class _MyAppState extends State<MyApp> {
 }
 
 final GoRouter _router = GoRouter(
-  initialLocation: "/login",
+  initialLocation: "/completeDance",
   redirect: (context, state) {
     final authState = context.read<AuthCubit>().state;
     if (authState.authStatus == AuthStatus.complete && state.topRoute!.path == "/login") {
@@ -163,6 +170,21 @@ final GoRouter _router = GoRouter(
       builder: (context, state) {
         final gameData = state.extra as GameData?;
         return SelectDanceScreen(gameData: gameData!);
+      }
+    ),
+    GoRoute(
+      path: "/playDance",
+      builder: (context, state) {
+        final danceInfo = state.extra as DanceInfo?;
+        return PlayDanceScreen(danceInfo: danceInfo!);
+      }
+    ),
+    GoRoute(
+      path: "/completeDance",
+      builder: (context, state) {
+        // final danceInfo = state.extra as DanceInfo?;
+        // return CompleteDanceScreen(danceInfo: danceInfo!);
+        return CompleteDanceScreen();
       }
     )
   ]

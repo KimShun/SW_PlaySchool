@@ -7,7 +7,7 @@ plugins {
 
 android {
     namespace = "com.example.playschool"
-    compileSdk = flutter.compileSdkVersion
+    compileSdk = 35
 
 
     compileOptions {
@@ -27,7 +27,7 @@ android {
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
-        minSdkVersion 24
+        minSdkVersion 21
     }
 
     buildTypes {
