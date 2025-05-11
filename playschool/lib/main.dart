@@ -15,6 +15,7 @@ import 'package:playschool/src/games/dance/completeDance.dart';
 import 'package:playschool/src/games/dance/cubit/danceCubit.dart';
 import 'package:playschool/src/games/dance/cubit/popUpDanceCubit.dart';
 import 'package:playschool/src/games/dance/playDance.dart';
+import 'package:playschool/src/games/dance/repository/DanceRepository.dart';
 import 'package:playschool/src/games/dance/repository/danceList.dart';
 import 'package:playschool/src/games/dance/selectDance.dart';
 import 'package:playschool/src/games/drawing/drawingGame.dart';
@@ -62,7 +63,7 @@ class _MyAppState extends State<MyApp> {
       providers: [
         RepositoryProvider(create: (context) => AuthRepository(baseUrl: baseUrl)),
         RepositoryProvider(create: (context) => GameRepository(baseUrl: baseUrl)),
-        // RepositoryProvider(create: (context) => DanceRepository()),
+        RepositoryProvider(create: (context) => DanceRepository()),
       ],
       child: MultiBlocProvider(
         providers: [
@@ -71,7 +72,7 @@ class _MyAppState extends State<MyApp> {
           BlocProvider(create: (context) => PuzzleCubit()),
           BlocProvider(create: (context) => WordCubit()),
           BlocProvider(create: (context) => PopDanceCubit()),
-          BlocProvider(create: (context) => DanceCubit()),
+          BlocProvider(create: (context) => DanceCubit(danceRepository: context.read<DanceRepository>())),
         ],
         child: BlocListener<AuthCubit, AuthState>(
           listener: (context, state) {

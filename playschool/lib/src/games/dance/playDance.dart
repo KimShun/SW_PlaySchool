@@ -80,6 +80,7 @@ class _PlayDanceScreenState extends State<PlayDanceScreen> {
                   ),
                 ),
               ),
+              // 게임 시작하기 전 ( 비디오 및 카메라 설정단계 )
               if (!state.isReadyToStart)
                 Container(
                   color: Colors.black54.withOpacity(0.8),
@@ -131,7 +132,7 @@ class _PlayDanceScreenState extends State<PlayDanceScreen> {
                             ),
                           if (state.isVideoInitialized && state.isCameraInitialized)
                             const Text("놀 준비가 다 됐어~ 준비가 되면 아래 버튼 눌러줘~",
-                              style: const TextStyle(
+                              style: TextStyle(
                                 color: Colors.white70,
                                 fontWeight: FontWeight.bold,
                                 fontSize: 20.0,
@@ -169,6 +170,7 @@ class _PlayDanceScreenState extends State<PlayDanceScreen> {
                     ],
                   )
                 ),
+              // 시작버튼은 눌렀으나 아직 게임은 시작하지 않음.
               if (state.isReadyToStart && !state.isStart)
                 SizedBox.expand(
                   child: Container(
@@ -194,6 +196,77 @@ class _PlayDanceScreenState extends State<PlayDanceScreen> {
                     ),
                   ),
                 ),
+              // 게임이 끝났을 때
+              if (state.isFinish)
+                Container(
+                    color: Colors.black54.withOpacity(0.8),
+                    child: Stack(
+                      children: [
+                        Positioned(
+                          top: 20,
+                          left: 20,
+                          child: GestureDetector(
+                            onTap: () {
+                              context.pop();
+                            },
+                            child: Image.asset("assets/icon/exit.png",
+                              width: 40,
+                              height: 40,
+                            ),
+                          ),
+                        ),
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Lottie.asset("assets/lottie/dog_loading.json",
+                              width: 200,
+                              height: 200,
+                            ),
+                            const Text("✅ 게임종료!! ✅",
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 25.0
+                              ),
+                            ),
+                            const Text("정말 수고했어~! 평가 단계로 넘어갈까~??",
+                              style: TextStyle(
+                                color: Colors.white70,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 20.0,
+                              ),
+                            ),
+                            const SizedBox(height: 10.0),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                SizedBox(
+                                  width: 130,
+                                  child: ElevatedButton(
+                                    onPressed: () {
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.orange
+                                    ),
+                                    child: const Center(
+                                      child: Text("평가하기!!",
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 18.0
+                                        ),
+                                      ),
+                                    )
+                                  ),
+                                )
+                              ],
+                            )
+                          ],
+                        ),
+                      ],
+                    )
+                ),
+              // 게임을 일시정지 했을 때
               if (state.isShowing)
                 GestureDetector(
                   onDoubleTap: () {
