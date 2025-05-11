@@ -4,10 +4,15 @@ import 'dart:io';
 import 'package:bloc/bloc.dart';
 import 'package:camera/camera.dart';
 import 'package:equatable/equatable.dart';
+import 'package:playschool/src/games/dance/repository/DanceRepository.dart';
 import 'package:video_player/video_player.dart';
 
 class DanceCubit extends Cubit<DanceState> {
-  DanceCubit() : super(DanceState()) {}
+  final DanceRepository danceRepository;
+
+  DanceCubit({
+    required this.danceRepository,
+  }) : super(DanceState()) {}
 
   late Timer _countdownTimer;
   int _countdown = 5;
@@ -20,7 +25,7 @@ class DanceCubit extends Cubit<DanceState> {
     _controller.addListener(() async {
       if (_controller.value.position >= _controller.value.duration) {
         final videoFile = await state.cameraController!.stopVideoRecording();
-        await File(videoFile.path).delete();
+        emit(state.copyWith(isFinish: true, recordVideo: videoFile));
       }
     });
 
@@ -59,7 +64,11 @@ class DanceCubit extends Cubit<DanceState> {
   }
 
   Future<void> close() async {
-    _countdownTimer?.cancel();
+    // if (state.recordVideo != null) {
+    //   await File(state.recordVideo!.path).delete();
+    // }
+
+    _countdownTimer.cancel();
     state.videoController?.dispose();
     state.cameraController?.dispose();
     return super.close();
@@ -89,6 +98,10 @@ class DanceCubit extends Cubit<DanceState> {
     state.cameraController!.resumeVideoRecording();
     state.videoController!.play();
   }
+
+  void assessmentStart() async {
+    await danceRepository.fetchDanceResult(state.videoController!.dataSource, state.recordVideo!);
+  }
 }
 
 class DanceState extends Equatable {
@@ -100,6 +113,8 @@ class DanceState extends Equatable {
   final bool isReadyToStart;
   final bool isStart;
   final int countdown;
+  final bool isFinish;
+  final XFile? recordVideo;
   final Timer? countdownTimer;
 
   const DanceState({
@@ -111,6 +126,8 @@ class DanceState extends Equatable {
     this.isReadyToStart = false,
     this.isStart = false,
     this.countdown = 5,
+    this.isFinish = false,
+    this.recordVideo,
     this.countdownTimer
   });
 
@@ -123,6 +140,8 @@ class DanceState extends Equatable {
     bool? isReadyToStart,
     bool? isStart,
     int? countdown,
+    bool? isFinish,
+    XFile? recordVideo,
     Timer? countdownTimer,
   }) {
     return DanceState(
@@ -134,11 +153,13 @@ class DanceState extends Equatable {
       isReadyToStart: isReadyToStart ?? this.isReadyToStart,
       isStart: isStart ?? this.isStart,
       countdown: countdown ?? this.countdown,
+      isFinish: isFinish ?? this.isFinish,
+      recordVideo: recordVideo ?? this.recordVideo,
       countdownTimer: countdownTimer ?? this.countdownTimer,
     );
   }
 
   @override
   // TODO: implement props
-  List<Object?> get props => [videoController, cameraController, isShowing, isCameraInitialized, isVideoInitialized, isReadyToStart, isStart, countdown, countdownTimer];
+  List<Object?> get props => [videoController, cameraController, isShowing, isCameraInitialized, isVideoInitialized, isReadyToStart, isStart, countdown, isFinish, recordVideo, countdownTimer];
 }
