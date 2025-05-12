@@ -34,7 +34,7 @@ app.add_middleware(
 )
 
 @app.post("/exercise/dance/assessment")
-async def assessmentDance(original: UploadFile = File(...), follow: UploadFile = File(...)):
+async def assessmentDance(original: UploadFile = File(...), record: UploadFile = File(...)):
     BaseOptions = mp.tasks.BaseOptions
     PoseLandmarker = mp.tasks.vision.PoseLandmarker
     PoseLandmarkerOptions = mp.tasks.vision.PoseLandmarkerOptions
@@ -61,29 +61,29 @@ async def assessmentDance(original: UploadFile = File(...), follow: UploadFile =
     detector_original.close() # 분석 종료
     
     # 따라한 동영상 분석하기 위한 MediaPipe 모델 구성
-    options_follow = PoseLandmarkerOptions(
+    options_record = PoseLandmarkerOptions(
         base_options=BaseOptions(model_asset_path=model_path),
         running_mode=VisionRunningMode.VIDEO
     )
 
-    detector_follow = vision.PoseLandmarker.create_from_options(options_follow)
+    detector_record = vision.PoseLandmarker.create_from_options(options_record)
     
     # 따라한 동영상 시스템에 임시저장
-    data = await follow.read()
+    data = await record.read()
     with tempfile.NamedTemporaryFile(delete=False, suffix=".mp4") as f:
         f.write(data)
-        follow_path = f.name
+        record_path = f.name
 
     # 따라한 동영상 분석 시작
-    follow_landmarks = extract_pose_landmarks(follow_path, detector_follow)
-    detector_follow.close() # 분석 종료
+    record_landmarks = extract_pose_landmarks(record_path, detector_record)
+    detector_record.close() # 분석 종료
 
-    similarity = calculate_similarity(original_landmarks, follow_landmarks) # 유사도 검사
-    movement = calculate_movement_range(follow_landmarks) # 움직임 범위 검사
+    similarity = calculate_similarity(original_landmarks, record_landmarks) # 유사도 검사
+    movement = calculate_movement_range(record_landmarks) # 움직임 범위 검사
 
     # 임시로 저장한 동영상 파일 삭제
     os.remove(original_path)
-    os.remove(follow_path)
+    os.remove(record_path)
 
     return {
         "similarity_score" : similarity,
