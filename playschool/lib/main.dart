@@ -56,6 +56,7 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   final baseUrl = "https://sw-playschool.onrender.com";
+  final danceApiUrl = "https://sw-playschool-danceapi.onrender.com";
 
   @override
   Widget build(BuildContext context) {
@@ -63,7 +64,7 @@ class _MyAppState extends State<MyApp> {
       providers: [
         RepositoryProvider(create: (context) => AuthRepository(baseUrl: baseUrl)),
         RepositoryProvider(create: (context) => GameRepository(baseUrl: baseUrl)),
-        RepositoryProvider(create: (context) => DanceRepository()),
+        RepositoryProvider(create: (context) => DanceRepository(baseUrl: danceApiUrl)),
       ],
       child: MultiBlocProvider(
         providers: [
@@ -91,7 +92,7 @@ class _MyAppState extends State<MyApp> {
 }
 
 final GoRouter _router = GoRouter(
-  initialLocation: "/completeDance",
+  initialLocation: "/login",
   redirect: (context, state) {
     final authState = context.read<AuthCubit>().state;
     if (authState.authStatus == AuthStatus.complete && state.topRoute!.path == "/login") {
@@ -183,9 +184,8 @@ final GoRouter _router = GoRouter(
     GoRoute(
       path: "/completeDance",
       builder: (context, state) {
-        // final danceInfo = state.extra as DanceInfo?;
-        // return CompleteDanceScreen(danceInfo: danceInfo!);
-        return CompleteDanceScreen();
+        final danceInfo = state.extra as DanceInfo?;
+        return CompleteDanceScreen(danceInfo: danceInfo!);
       }
     )
   ]

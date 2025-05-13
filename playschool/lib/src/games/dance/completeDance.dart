@@ -1,18 +1,38 @@
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lottie/lottie.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:playschool/src/common/component/color.dart';
 import 'package:go_router/go_router.dart';
+import 'package:playschool/src/games/dance/cubit/danceCubit.dart';
 import 'package:playschool/src/games/dance/repository/danceList.dart';
+import 'package:video_player/video_player.dart';
 
-class CompleteDanceScreen extends StatelessWidget {
-  // final DanceInfo danceInfo;
+class CompleteDanceScreen extends StatefulWidget {
+  final DanceInfo danceInfo;
 
   const CompleteDanceScreen({
     super.key,
-    // required this.danceInfo,
+    required this.danceInfo,
   });
+
+  @override
+  State<CompleteDanceScreen> createState() => _CompleteDanceScreenState();
+}
+
+class _CompleteDanceScreenState extends State<CompleteDanceScreen> {
+  late VideoPlayerController videoController;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    videoController = VideoPlayerController.asset(context.read<DanceCubit>().state.recordVideo!.path);
+    videoController.setPlaybackSpeed(1.5);
+    videoController.setVolume(0.5);
+    videoController.play();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,12 +56,11 @@ class CompleteDanceScreen extends StatelessWidget {
             child: Column(
               children: [
                 // 상단 영역
-                _Header(needsSafeArea: needsSafeArea, danceInfo: DanceInfo(
-                  iconPath: "assets/dance/icon/bunny.png",
-                  danceName: "산토끼 토끼야",
-                  videoPath: "",
-                  copyRight: "",
-                )),
+                _Header(
+                  needsSafeArea: needsSafeArea,
+                  danceInfo: widget.danceInfo,
+                  videoController: videoController,
+                ),
                 const SizedBox(height: 10),
                 // 별 점수 영역
                 _StarScore(),
@@ -61,11 +80,13 @@ class CompleteDanceScreen extends StatelessWidget {
 class _Header extends StatelessWidget {
   final bool needsSafeArea;
   final DanceInfo danceInfo;
+  final VideoPlayerController videoController;
 
   const _Header({
     super.key,
     required this.needsSafeArea,
     required this.danceInfo,
+    required this.videoController,
   });
 
   @override
@@ -140,6 +161,7 @@ class _Header extends StatelessWidget {
                             color: EXERCISE_CARD_COLOR,
                             borderRadius: BorderRadius.circular(30)
                           ),
+                          child: VideoPlayer(videoController),
                         )
                     ),
                   ],
@@ -151,7 +173,7 @@ class _Header extends StatelessWidget {
               right: MediaQuery.of(context).size.width * 0.035,
               child: GestureDetector(
                 onTap: () {
-                  context.pop();
+                  context.go("/");
                 },
                 child: Image.asset("assets/icon/exit.png",
                   width: 40,
@@ -175,16 +197,18 @@ class _StarScore extends StatelessWidget {
       children: [
         Column(
           children: [
-            _StarIconThree(),
+            context.read<DanceCubit>().state.danceAPI!.totalScore >= 80
+                ? _StarIconThree() : context.read<DanceCubit>().state.danceAPI!.totalScore >= 50
+                ? _StarIconTwo() : _StarIconOne(),
             const SizedBox(height: 10.0),
-            Text("💕 점수: 80점 💕",
+            Text("💕 점수: ${context.read<DanceCubit>().state.danceAPI!.totalScore}점 💕",
               style: TextStyle(
                   color: EXERCISE_TEXT_COLOR,
                   fontWeight: FontWeight.bold,
                   fontSize: 18.0
               ),
             ),
-            Text("굉장해!! 너 소질이 있구나~!!",
+            Text(context.read<DanceCubit>().state.danceAPI!.totalContent,
               style: TextStyle(
                   color: TEXT_COLOR,
                   fontWeight: FontWeight.bold,
@@ -347,10 +371,20 @@ class _AssessmentContent extends StatelessWidget {
           ),
           const SizedBox(height: 20.0),
           // 정확도
-          _percentAssessment(1.0, "100점", "정확도", "자세가 아주 정확해~ 대단해!!"),
+          _percentAssessment(
+            context.read<DanceCubit>().state.danceAPI!.similarityScore / 100,
+            "${context.read<DanceCubit>().state.danceAPI!.similarityScore}점",
+            "정확도",
+            context.read<DanceCubit>().state.danceAPI!.similarityContent
+          ),
           const SizedBox(height: 20.0),
           // 열정적
-          _percentAssessment(0.7, "70점", "열정적", "훌륭하게 춤을 췄어!! 멋있당~"),
+          _percentAssessment(
+              context.read<DanceCubit>().state.danceAPI!.movementScore / 100,
+            "${context.read<DanceCubit>().state.danceAPI!.movementScore}점",
+            "열정적",
+            context.read<DanceCubit>().state.danceAPI!.movementContent
+          ),
         ],
       ),
     );
