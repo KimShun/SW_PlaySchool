@@ -8,7 +8,10 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lottie/lottie.dart';
+import 'package:playschool/src/authentication/cubit/authCubit.dart';
+import 'package:playschool/src/authentication/repository/AuthRepository.dart';
 import 'package:playschool/src/games/dance/repository/danceList.dart';
+import 'package:playschool/src/games/repository/GameRepository.dart';
 import 'package:video_player/video_player.dart';
 
 import '../../common/component/color.dart';
@@ -65,6 +68,8 @@ class _PlayDanceScreenState extends State<PlayDanceScreen> {
 
         if (state.danceStatus == DanceStatus.complete) {
           if (context.canPop()) { context.pop(); }
+          context.read<AuthRepository>().userExpUp(context, context.read<AuthCubit>().state.token!);
+          context.read<GameRepository>().updateGame(context, 3, context.read<AuthCubit>().state.token!);
           context.go("/completeDance", extra: widget.danceInfo);
         }
       },
