@@ -141,7 +141,7 @@ class _MyPageHeader extends StatelessWidget {
                           ),
                           const SizedBox(width: 10),
                           Text(DateFormat("yyyy년 M월 d일", "ko").format(userData.birthDate),
-                            style: TextStyle(
+                            style: const TextStyle(
                               color: Color(0xFF4A4A4A),
                               fontWeight: FontWeight.bold,
                               fontSize: 15.0,

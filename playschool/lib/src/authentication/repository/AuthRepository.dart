@@ -1,6 +1,9 @@
 import 'dart:convert';
 
+import 'package:flutter/cupertino.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:http/http.dart' as http;
+import 'package:playschool/src/authentication/cubit/userCubit.dart';
 import 'package:playschool/src/authentication/model/User.dart';
 
 class AuthRepository {
@@ -66,6 +69,32 @@ class AuthRepository {
       return "회원가입 성공";
     } else {
       throw Exception("회원가입 실패: ${response.body}");
+    }
+  }
+
+  Future<void> userExpUp(BuildContext context, String token) async {
+    final response = await http.patch(
+      Uri.parse("$baseUrl/api/auth/expup"),
+      headers: {
+        "Authorization": "Bearer $token",
+      },
+    );
+
+    if (response.statusCode == 200) {
+      context.read<UserCubit>().userExpUp();
+    }
+  }
+
+  Future<void> userLevelUp(BuildContext context, String token) async {
+    final response = await http.patch(
+      Uri.parse("$baseUrl/api/auth/levelup"),
+      headers: {
+        "Authorization": "Bearer $token",
+      },
+    );
+
+    if (response.statusCode == 200) {
+      context.read<UserCubit>().userLevelUp();
     }
   }
 }

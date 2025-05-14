@@ -36,4 +36,22 @@ class GamePlay {
       "makeBookGame" : makeBookGame
     };
   }
+
+  GamePlay copyWith({
+    String? userUID,
+    int? wordGame,
+    int? findWrongGame,
+    int? danceGame,
+    int? paintGame,
+    int? makeBookGame,
+  }) {
+    return GamePlay(
+      userUID: userUID ?? this.userUID,
+      wordGame: wordGame ?? this.wordGame,
+      findWrongGame: findWrongGame ?? this.findWrongGame,
+      danceGame: danceGame ?? this.danceGame,
+      paintGame: paintGame ?? this.paintGame,
+      makeBookGame: makeBookGame ?? this.makeBookGame,
+    );
+  }
 }

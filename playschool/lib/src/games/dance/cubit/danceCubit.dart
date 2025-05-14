@@ -7,6 +7,8 @@ import 'package:equatable/equatable.dart';
 import 'package:playschool/src/games/dance/repository/DanceRepository.dart';
 import 'package:video_player/video_player.dart';
 
+import '../model/DanceAPI.dart';
+
 class DanceCubit extends Cubit<DanceState> {
   final DanceRepository danceRepository;
 
@@ -23,9 +25,11 @@ class DanceCubit extends Cubit<DanceState> {
     _controller.setVolume(1.0);
 
     _controller.addListener(() async {
-      if (_controller.value.position >= _controller.value.duration) {
-        final videoFile = await state.cameraController!.stopVideoRecording();
-        emit(state.copyWith(isFinish: true, recordVideo: videoFile));
+      if (_controller.value.position >= _controller.value.duration && !state.isFinish) {
+        if (state.cameraController!.value.isRecordingVideo) {
+          final videoFile = await state.cameraController!.stopVideoRecording();
+          emit(state.copyWith(isFinish: true, recordVideo: videoFile));
+        }
       }
     });
 
@@ -39,7 +43,6 @@ class DanceCubit extends Cubit<DanceState> {
         ResolutionPreset.medium
     );
     await _cameraController.initialize();
-
     emit(state.copyWith(cameraController: _cameraController, isCameraInitialized: true));
   }
 
@@ -64,10 +67,6 @@ class DanceCubit extends Cubit<DanceState> {
   }
 
   Future<void> close() async {
-    // if (state.recordVideo != null) {
-    //   await File(state.recordVideo!.path).delete();
-    // }
-
     _countdownTimer.cancel();
     state.videoController?.dispose();
     state.cameraController?.dispose();
@@ -99,9 +98,29 @@ class DanceCubit extends Cubit<DanceState> {
     state.videoController!.play();
   }
 
-  void assessmentStart() async {
-    await danceRepository.fetchDanceResult(state.videoController!.dataSource, state.recordVideo!);
+  Future<void> assessmentStart() async {
+    emit(state.copyWith(danceStatus: DanceStatus.loading));
+    try {
+      final danceAPI = await danceRepository.fetchDanceResult(state.videoController!.dataSource, state.recordVideo!);
+      emit(state.copyWith(danceAPI: danceAPI, danceStatus: DanceStatus.complete));
+    } catch (e) {
+      emit(state.copyWith(danceStatus: DanceStatus.error));
+      print("$e");
+    }
   }
+
+  void deleteRecordVideo() async {
+    if (state.recordVideo != null) {
+      await File(state.recordVideo!.path).delete();
+    }
+  }
+}
+
+enum DanceStatus {
+  init,
+  loading,
+  complete,
+  error
 }
 
 class DanceState extends Equatable {
@@ -116,6 +135,8 @@ class DanceState extends Equatable {
   final bool isFinish;
   final XFile? recordVideo;
   final Timer? countdownTimer;
+  final DanceAPI? danceAPI;
+  final DanceStatus danceStatus;
 
   const DanceState({
     this.videoController,
@@ -128,7 +149,9 @@ class DanceState extends Equatable {
     this.countdown = 5,
     this.isFinish = false,
     this.recordVideo,
-    this.countdownTimer
+    this.countdownTimer,
+    this.danceAPI,
+    this.danceStatus = DanceStatus.init,
   });
 
   DanceState copyWith ({
@@ -143,6 +166,8 @@ class DanceState extends Equatable {
     bool? isFinish,
     XFile? recordVideo,
     Timer? countdownTimer,
+    DanceAPI? danceAPI,
+    DanceStatus? danceStatus,
   }) {
     return DanceState(
       videoController: videoController ?? this.videoController,
@@ -156,10 +181,26 @@ class DanceState extends Equatable {
       isFinish: isFinish ?? this.isFinish,
       recordVideo: recordVideo ?? this.recordVideo,
       countdownTimer: countdownTimer ?? this.countdownTimer,
+      danceAPI: danceAPI ?? this.danceAPI,
+      danceStatus: danceStatus ?? this.danceStatus,
     );
   }
 
   @override
   // TODO: implement props
-  List<Object?> get props => [videoController, cameraController, isShowing, isCameraInitialized, isVideoInitialized, isReadyToStart, isStart, countdown, isFinish, recordVideo, countdownTimer];
+  List<Object?> get props => [
+    videoController,
+    cameraController,
+    isShowing,
+    isCameraInitialized,
+    isVideoInitialized,
+    isReadyToStart,
+    isStart,
+    countdown,
+    isFinish,
+    recordVideo,
+    countdownTimer,
+    danceAPI,
+    danceStatus,
+  ];
 }

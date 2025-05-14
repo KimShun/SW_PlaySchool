@@ -24,4 +24,17 @@ class GameRepository {
       print(context.read<UserCubit>().state!.todayGame2);
     }
   }
+
+  Future<void> updateGame(BuildContext context, int gameNumber, String token) async {
+    final response = await http.patch(
+      Uri.parse("$baseUrl/api/game/gameupdate?gameNumber=$gameNumber"),
+      headers: {
+        "Authorization": "Bearer $token",
+      },
+    );
+
+    if (response.statusCode == 200) {
+      context.read<UserCubit>().updateGame(gameNumber);
+    }
+  }
 }
