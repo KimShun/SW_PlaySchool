@@ -14,7 +14,9 @@ class DanceCubit extends Cubit<DanceState> {
 
   DanceCubit({
     required this.danceRepository,
-  }) : super(DanceState()) {}
+  }) : super(DanceState()) {
+    DanceState();
+  }
 
   late Timer _countdownTimer;
   int _countdown = 5;

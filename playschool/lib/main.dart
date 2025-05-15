@@ -96,12 +96,12 @@ class _MyAppState extends State<MyApp> {
 }
 
 final GoRouter _router = GoRouter(
-  initialLocation: "/word_matching",
+  initialLocation: "/login",
   redirect: (context, state) {
-    // final authState = context.read<AuthCubit>().state;
-    // if (authState.authStatus == AuthStatus.complete && state.topRoute!.path == "/login") {
-    //   return "/";
-    // }
+    final authState = context.read<AuthCubit>().state;
+    if (authState.authStatus == AuthStatus.complete && state.topRoute!.path == "/login") {
+      return "/";
+    }
 
     return null;
   },
@@ -203,9 +203,5 @@ final GoRouter _router = GoRouter(
         return WordMatchingDetail(label: label);
       },
     ),
-
-
-
-
   ]
 );
