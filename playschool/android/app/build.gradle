@@ -7,27 +7,54 @@ plugins {
 
 android {
     namespace = "com.example.playschool"
-    compileSdk = 35
+    compileSdkVersion 35
 
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
 
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_1_8
+        jvmTarget = "11"
     }
+
+    packagingOptions {
+        // arm64-v8a
+        exclude  'lib/arm64-v8a/libavcodec.so'
+        exclude  'lib/arm64-v8a/libavformat.so'
+        exclude  'lib/arm64-v8a/libavutil.so'
+        exclude  'lib/arm64-v8a/libswresample.so'
+        exclude  'lib/arm64-v8a/libswscale.so'
+        exclude  'lib/arm64-v8a/libavfilter.so'
+
+        // armeabi-v7a
+        exclude  'lib/armeabi-v7a/libavcodec.so'
+        exclude  'lib/armeabi-v7a/libavformat.so'
+        exclude  'lib/armeabi-v7a/libavutil.so'
+        exclude  'lib/armeabi-v7a/libswresample.so'
+        exclude  'lib/armeabi-v7a/libswscale.so'
+        exclude  'lib/armeabi-v7a/libavfilter.so'
+
+        // x86_64
+        exclude  'lib/x86_64/libavcodec.so'
+        exclude  'lib/x86_64/libavformat.so'
+        exclude  'lib/x86_64/libavutil.so'
+        exclude   'lib/x86_64/libswresample.so'
+        exclude  'lib/x86_64/libswscale.so'
+        exclude  'lib/x86_64/libavfilter.so'
+    }
+
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId = "com.example.playschool"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
-        targetSdk = flutter.targetSdkVersion
+        targetSdkVersion 35
         versionCode = flutter.versionCode
         versionName = flutter.versionName
-        minSdkVersion 21
+        minSdkVersion 24
     }
 
     buildTypes {
