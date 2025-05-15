@@ -37,6 +37,8 @@ import 'package:playschool/src/home.dart';
 import 'package:playschool/src/myPage/myPage.dart';
 import 'package:playschool/src/authentication/login.dart';
 import 'package:playschool/src/authentication/signup.dart';
+import 'package:playschool/src/games/word_matching/word_matching_game.dart';
+import 'package:playschool/src/games/word_matching/word_matching_detail.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -94,12 +96,12 @@ class _MyAppState extends State<MyApp> {
 }
 
 final GoRouter _router = GoRouter(
-  initialLocation: "/login",
+  initialLocation: "/word_matching",
   redirect: (context, state) {
-    final authState = context.read<AuthCubit>().state;
-    if (authState.authStatus == AuthStatus.complete && state.topRoute!.path == "/login") {
-      return "/";
-    }
+    // final authState = context.read<AuthCubit>().state;
+    // if (authState.authStatus == AuthStatus.complete && state.topRoute!.path == "/login") {
+    //   return "/";
+    // }
 
     return null;
   },
@@ -189,6 +191,21 @@ final GoRouter _router = GoRouter(
         final danceInfo = state.extra as DanceInfo?;
         return CompleteDanceScreen(danceInfo: danceInfo!);
       }
-    )
+    ),
+    GoRoute(
+      path: "/word_matching",
+      builder: (context, state) => const WordMatching(),
+    ),
+    GoRoute(
+      path: '/word_matching_detail',
+      builder: (context, state) {
+        final label = (state.extra as Map?)?['label'] ?? '';
+        return WordMatchingDetail(label: label);
+      },
+    ),
+
+
+
+
   ]
 );
