@@ -96,8 +96,6 @@ class _MyPageHeader extends StatelessWidget {
                 right: 18,
                 child: buildLifeBar(),
               ),
-
-
               Column(
                 children: [
                   const SizedBox(height: 45),

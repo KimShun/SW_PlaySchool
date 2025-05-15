@@ -35,7 +35,7 @@ class DanceRepository {
 
   Future<DanceAPI> fetchDanceResult(String original, XFile record) async {
     // final uri = Uri.parse("$baseUrl/exercise/dance/assessment");
-    final uri = Uri.parse("http://192.168.1.57:8000/exercise/dance/assessment");
+    final uri = Uri.parse("http://10.20.106.244:8000/exercise/dance/assessment");
 
     final originalFile = await copyAssetToFile(original, "original.mov");
     final rotatedRecordFile = await rotateVideo(record);

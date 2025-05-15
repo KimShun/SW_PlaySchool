@@ -48,12 +48,11 @@ class WordMatching extends StatelessWidget {
                         final item = items[index];
                         return GestureDetector(
                           onTap: () {
-                            context.go(
+                            context.push(
                               '/word_matching_detail',
                               extra: {'label': item['label']},
                             );
                           },
-
                           child: buildItemCard(item['img'], item['color'], item['label']),
                         );
                       },

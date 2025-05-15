@@ -17,8 +17,8 @@ class DanceAPI {
 
   factory DanceAPI.fromJson(Map<String, dynamic>  json) {
     final similarity = json["similarity_score"];
-    final movement = (json["movement_range"] + 0.2) * 100;
-    final total = similarity * 0.8 + movement * 0.2;
+    final movement = json["movement_range"] * 10 + 20;
+    final total = similarity * 0.7 + movement * 0.3;
 
     String getTotalComment(double total) {
       if (total >= 85) {
