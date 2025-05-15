@@ -1,4 +1,9 @@
+import 'dart:io';
+
+import 'package:device_info_plus/device_info_plus.dart';
+import 'package:ffmpeg_kit_flutter_new/ffmpeg_kit.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
@@ -10,7 +15,6 @@ import 'package:playschool/src/authentication/repository/AuthRepository.dart';
 import 'package:playschool/src/common/component/color.dart';
 import 'package:playschool/src/common/detailGame/detailGame.dart';
 import 'package:playschool/src/common/detailGame/gameInfo.dart';
-import 'package:playschool/src/common/permission.dart';
 import 'package:playschool/src/games/dance/completeDance.dart';
 import 'package:playschool/src/games/dance/cubit/danceCubit.dart';
 import 'package:playschool/src/games/dance/cubit/popUpDanceCubit.dart';
@@ -36,14 +40,12 @@ import 'package:playschool/src/authentication/signup.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await initializeDateFormatting('ko', null); // 로케일 초기화
-  await requestPermission(); // 권한 접근
+  await initializeDateFormatting('ko', null);
 
-  final storage = await HydratedStorage.build(
-      storageDirectory: HydratedStorageDirectory((await getApplicationDocumentsDirectory()).path)
+  HydratedBloc.storage = await HydratedStorage.build(
+    storageDirectory: HydratedStorageDirectory((await getTemporaryDirectory()).path),
   );
 
-  HydratedBloc.storage = storage;
   runApp(const MyApp());
 }
 
