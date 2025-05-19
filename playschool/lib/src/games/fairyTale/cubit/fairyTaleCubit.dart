@@ -1,11 +1,26 @@
+import 'package:camera/camera.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:playschool/src/games/fairyTale/model/FairyTaleResult.dart';
+import 'package:playschool/src/games/fairyTale/repository/FairyTaleRepository.dart';
 
 class FairyTaleCubit extends Cubit<FairyTaleState> {
-  FairyTaleCubit() : super(FairyTaleState());
+  final FairyTaleRepository fairyTaleRepository;
 
+  FairyTaleCubit({
+    required this.fairyTaleRepository
+  }) : super(FairyTaleState());
 
+  Future<void> createFairy(String content, String userUID, {XFile? img}) async {
+    emit(state.copyWith(fairyTaleStatus: FairyTaleStatus.loading));
+
+    try {
+      final fairyTaleResult = await fairyTaleRepository.createFairyBook(content, userUID, img);
+      emit(state.copyWith(fairyTaleResult: fairyTaleResult, fairyTaleStatus: FairyTaleStatus.complete));
+    } catch(e) {
+      emit(state.copyWith(fairyTaleStatus: FairyTaleStatus.error));
+    }
+  }
 }
 
 enum FairyTaleStatus {

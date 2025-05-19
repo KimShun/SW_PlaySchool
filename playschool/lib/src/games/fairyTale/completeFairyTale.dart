@@ -1,32 +1,21 @@
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_card_swiper/flutter_card_swiper.dart';
 import 'package:playschool/src/common/component/color.dart';
+import 'package:playschool/src/games/fairyTale/cubit/fairyTaleCubit.dart';
 
 class CompleteFairyTaleScreen extends StatelessWidget {
-  // final Map<String, dynamic> args;
+  final Map<String, dynamic> args;
 
   const CompleteFairyTaleScreen({
     super.key,
-    // required this.args,
+    required this.args,
   });
 
   @override
   Widget build(BuildContext context) {
-    List<Map<String, String>> fairyResults = [
-      {
-        "image" : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQxQyFCW3538pD9JB_yHOMNaw0bsVmZ41Q91w&s",
-        "content" : "토끼가 코를 벌렁벌렁 거리고 있어!!"
-      },
-      {
-        "image" : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSFVFxfeGIN-ceu1MAh1PWlG_WA-JZs7nEXPw&s",
-        "content" : "멋쟁이 고양이가 여유롭게 쉬고 있어!!"
-      },
-      {
-        "image" : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQHXmtOlXqSp1QkPlvIXRD2esqZpf_dbWhahQ&s",
-        "content" : "힝.. 라면이 먹고 싶은 강아지... ㅠㅠ"
-      }
-    ];
+    List<Map<String, String>> fairyResults = context.read<FairyTaleCubit>().state.fairyTaleResult!.fairyResults;
 
     bool hasSafeArea(BuildContext context) {
       final padding = MediaQuery.of(context).padding;
@@ -223,7 +212,10 @@ class _CompleteHeaderScreen extends StatelessWidget {
                                   height: 220,
                                   child: ClipRRect(
                                     borderRadius: const BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20)),
-                                    child: Image.network(fairyResults[index]["image"]!, fit: BoxFit.cover),
+                                    child: Image.network(
+                                      fairyResults[index]["image"]!,
+                                      fit: BoxFit.cover
+                                    ),
                                   ),
                                 ),
                                 const SizedBox(height: 10.0),

@@ -54,7 +54,7 @@ class UserCubit extends Cubit<User?> {
   void userLevelUp() async {
     late User updatedUser;
 
-    updatedUser = state!.copyWith(level: state!.level + 1);
+    updatedUser = state!.copyWith(level: state!.level + 1, exp: 0);
     emit(updatedUser);
   }
 }
