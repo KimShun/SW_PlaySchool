@@ -4,16 +4,17 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from openai import OpenAI
-from typing import Optional
+from typing import Union
 
 import os
 import json
 import re
 import importlib.util
+import asyncio
+import httpx
+from concurrent.futures import ThreadPoolExecutor
 
-from dotenv import load_dotenv
-OPENAI_KEY = os.getenv("OPENAI_API_KEY")
-
+OPENAI_KEY = "API-KEY"
 os.environ["KNP_DUPLICATION_LIB_OK"] = "True"
 
 app = FastAPI()
@@ -49,19 +50,7 @@ app.mount("/output", StaticFiles(directory=OUTPUT_FOLDER), name="output")
 # 허용할 파일 확장자
 ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "jfif"}
 
-# fairyBook 모델 불러오기
-module_name = "fairyBook"
-module_path = os.path.join("custom_nodes", "ComfyUI-to-Python-Extension", "nodes", "fairyBook.py")
-spec = importlib.util.spec_from_file_location(module_name, module_path)
-fairyBook_module = importlib.util.module_from_spec(spec)
-spec.loader.exec_module(fairyBook_module)
-
-# fairyBook_Face 모델 불러오기
-module_name = "fairyBookFace"
-module_path = os.path.join("custom_nodes", "ComfyUI-to-Python-Extension", "nodes", "fairyBook_Face.py")
-spec = importlib.util.spec_from_file_location(module_name, module_path)
-fairyBookFace_module = importlib.util.module_from_spec(spec)
-spec.loader.exec_module(fairyBookFace_module)
+executor = ThreadPoolExecutor()
 
 # @app.post("/test/chatGPT")
 # async def gpt(content: str = Form(...)):
@@ -70,12 +59,24 @@ spec.loader.exec_module(fairyBookFace_module)
 
 # 일반적인 동화책 만들기
 @app.post("/make/fairyBook")
-async def createMyFairyBook(content_line: str = Form(...), userUID: str = Form(...), img: Optional[UploadFile] = File(None)):
+async def createMyFairyBook(
+    content_line: str = Form(...), 
+    userUID: str = Form(...), 
+    img: Union[UploadFile, str, None] = File(default=None)):
+
+    # img가 빈 문자열("")로 들어올 경우 None으로 처리
+    if img == "" or img is None:
+        img = None
+
+    # img가 UploadFile 객체인지 확인
+    if img is not None and not isinstance(img, UploadFile):
+        raise HTTPException(status_code=400, detail="img 필드에 올바른 파일을 넣어주세요.")
+
     result_path_list = [
-        f"./output/fairyBook_{userUID}_00001_.jpg",
-        f"./output/fairyBook_{userUID}_00002_.jpg",
-        f"./output/fairyBook_{userUID}_00003_.jpg",
-        f"./output/fairyBook_{userUID}_00004_.jpg",
+        f"./output/fairyBook_{userUID}_00001_.png",
+        f"./output/fairyBook_{userUID}_00002_.png",
+        f"./output/fairyBook_{userUID}_00003_.png",
+        f"./output/fairyBook_{userUID}_00004_.png",
     ]
 
     for path in result_path_list:
@@ -84,7 +85,8 @@ async def createMyFairyBook(content_line: str = Form(...), userUID: str = Form(.
 
     try:
         prompt_result = make_prompt(content_line)
-        positive_prompt = "", negative_prompt = ""
+        # print(prompt_result)
+        positive_prompt = ""; negative_prompt = ""
 
         content_list = []
         for res in prompt_result:
@@ -92,15 +94,15 @@ async def createMyFairyBook(content_line: str = Form(...), userUID: str = Form(.
             negative_prompt += res["Negative Prompt"]; negative_prompt += "\n"
             content_list.append(res["description"])
 
-
         if img:
             if not allowed_file(img.filename):
                 raise HTTPException(status_code=400, detail="지원하지 않는 이미지 형식입니다.")
 
-            fairyBookFace_module.main(positive_prompt, negative_prompt, userUID, await img.read())
+            image_data = await img.read()
+            await call_comfyui_api(positive_prompt, negative_prompt, userUID, image_data)
 
         else:
-            fairyBook_module.main(positive_prompt, negative_prompt, userUID)
+            await call_comfyui_api(positive_prompt, negative_prompt, userUID)
 
         return {
             "message": "성공적으로 동화책이 완성되었습니다.!",
@@ -109,9 +111,55 @@ async def createMyFairyBook(content_line: str = Form(...), userUID: str = Form(.
         }
 
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         return JSONResponse({"error": str(e)}, status_code=500)
-    
 
+async def call_comfyui_api(positive_prompt, negative_prompt, userUID, image_data=None):
+    if (image_data == None):
+        url = "http://127.0.0.1:8188/prompt"
+
+        with open("./fairyBook.json", "r") as f:
+            workflow = json.load(f)
+
+        workflow["45"]["inputs"]["text"] = positive_prompt
+        workflow["46"]["inputs"]["text"] = negative_prompt
+        workflow["32"]["inputs"]["filename_prefix"] = f"fairyBook_{userUID}"
+    
+    else:
+        url = "http://127.0.0.1:8188/prompt"
+
+        with open("./fairyBook_Face.json", "r") as f:
+            workflow = json.load(f)
+
+        workflow["45"]["inputs"]["text"] = positive_prompt
+        workflow["46"]["inputs"]["text"] = negative_prompt
+        workflow["26"]["inputs"]["filename_prefix"] = f"fairyBook_{userUID}"
+
+        import tempfile
+        tmp_path = f"./input/{userUID}_input.png"
+        with open(tmp_path, "wb") as f:
+            f.write(image_data)
+
+        workflow["10"]["inputs"]["image"] = tmp_path
+    
+    async with httpx.AsyncClient() as client:
+        response = await client.post(url, json={"prompt": workflow})
+        response.raise_for_status()
+    
+    expected_images = [
+        f"./output/fairyBook_{userUID}_00001_.png",
+        f"./output/fairyBook_{userUID}_00002_.png",
+        f"./output/fairyBook_{userUID}_00003_.png",
+        f"./output/fairyBook_{userUID}_00004_.png",
+    ]
+
+    while True:
+        if all(os.path.exists(img) for img in expected_images):
+            break
+        await asyncio.sleep(1)  # 너무 빠르게 돌지 않게 1초 쉬기
+
+    return {"status": "complete"}
     
 def allowed_file(filename):
     return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -126,7 +174,48 @@ def make_prompt(content_line):
                 "content": [
                     {
                         "type": "input_text",
-                        "text": "## Role\n- 너는 ComfyUI Prompt 전문가이면서, 동화책 소설 작가야.\n- SD1.5와 LoRA 등의 기술을 잘 활용해 동화풍 일러스트를 만드는 데 특화되어 있어.\n- 등장인물들의 생김새, 옷차림, 색상, 특징을 **모든 컷에 정확히 동일하게 반복해서 묘사해줘**.\n- 등장인물의 외형(예: 헤어스타일, 눈 색, 옷, 표정 등)은 **컷마다 다시 써주고, 절대 변형되지 않도록 고정**해줘.\n\n## Task\n- 사용자가 전달한 주제를 바탕으로 자연스럽게 4컷 분량의 동화 이야기를 만들어줘.\n- 각 컷마다 이야기와 함께 이야기를 표현하기 위한 Positive Prompt와 Negative Prompt를 만들어줘.\n- 등장인물(예: 주인공, 동물 등)의 외형 정보는 **매 컷의 Positive Prompt에 정확히 동일하게 반복해서 작성해줘야 해**.\n- 표현이 가능한 범위 내에서 동작이나 배경은 단순하게 유지해줘. (ComfyUI의 한계 고려)\n- 결과물은 반드시 JSON 형식으로 출력하고, 각 컷에는 다음 4개의 항목을 포함해야 해:\n\n예시)\n\"scene\" : 1  \n\"description\" : ~~~~~  \n\"Positive Prompt\" : ~~~~~  \n\"Negative Prompt\" : ~~~~~  \n\n## TIP\n- 동화 내용을 아이들에게 말하는 것처럼 대화형식 처럼 만들어줘.\n- 이미지 왜곡이 없도록 신경 써줘.\n- 아이들 동화책 느낌을 살려, 따뜻하고 귀여운 분위기로 구성해줘.\n- Positive Prompt에는 LoRA에 적합한 표현 사용해주고, sketch, watercolor, storybook, colorful, soft light 은 반드시 포함해줘.\n- Negative Prompt에는 distortions, ugly, low quality, (embedding:easynegative) 등을 반드시 포함해줘.\n- 복잡한 동작이나 배경은 피하고, ComfyUI에서 표현이 쉬운 요소로 제한해줘.\n\n## WARNING\n- 등장인물의 옷이나 외형이 컷마다 달라지지 않도록 해. 컷마다 반복 안 하면 안 돼.\n- 프롬프트에서 인물 외형을 생략하거나 축약해서 쓰지 마. 항상 완전하게 써줘."
+                        "text": """## Role
+                                    - 너는 ComfyUI Prompt 전문가이면서, 동화책 소설 작가야.
+                                    - 등장인물들의 생김새, 옷차림, 색상, 특징을 모든 컷에 정확히 동일하게 반복해서 묘사해줘.
+                                    - 등장인물 외형(헤어스타일, 눈 색, 옷, 표정 등)은 컷마다 다시 써주고 절대 변형되지 않도록 고정해줘.
+
+                                    ## Task
+                                    - 사용자가 전달한 주제를 바탕으로 자연스럽게 4컷 분량의 동화 이야기를 만들어줘.
+                                    - 각 컷마다 다음 4개의 항목을 반드시 포함해줘:  
+                                    "scene", "description", "Positive Prompt", "Negative Prompt"
+                                    - Positive Prompt에는 LoRA에 적합한 표현 사용하고, 반드시 sketch, watercolor, storybook, colorful, soft light을 포함해줘.
+                                    - Negative Prompt에는 distortions, ugly, low quality, (embedding:easynegative) 등을 반드시 포함해줘.
+                                    - 등장인물 외형 정보는 매 컷의 Positive Prompt에 정확히 동일하게 반복해서 작성해줘.
+                                    - 동작이나 배경은 단순하게 유지해줘 (ComfyUI 한계 고려).
+
+                                    ## Output Format
+                                    - 결과물은 반드시 **JSON 배열** 형태로 출력해줘.  
+                                    - 예를 들어:
+
+                                    [
+                                    {
+                                        "scene": 1,
+                                        "description": "...",
+                                        "Positive Prompt": "...",
+                                        "Negative Prompt": "..."
+                                    },
+                                    {
+                                        "scene": 2,
+                                        "description": "...",
+                                        "Positive Prompt": "...",
+                                        "Negative Prompt": "..."
+                                    },
+                                    ...
+                                    ]
+
+                                    - JSON 배열 외에는 어떠한 텍스트도 포함하지 마세요.  
+                                    - 순수 JSON 문자열만 반환해 주세요.
+
+                                    ## Tip
+                                    - 아이들에게 이야기하듯 부드럽고 귀엽게 작성해줘.
+                                    - 이미지 왜곡이 없도록 주의해줘.
+                                    - 복잡한 동작과 배경은 피하고 단순하고 따뜻한 분위기로 구성해줘.
+                                    """
                     }
                 ]
             },
@@ -156,3 +245,7 @@ def make_prompt(content_line):
     response_data = response.output[0].content[0].text
     cleaned_text = re.sub(r"^```json\n|```$", "", response_data.strip(), flags=re.MULTILINE)
     return json.loads(cleaned_text)
+
+import uvicorn
+if __name__ == "__main__":
+    uvicorn.run("fairyBook_run:app", host="192.168.1.60", port=8001)

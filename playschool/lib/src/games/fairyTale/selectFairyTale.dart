@@ -1,10 +1,15 @@
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lottie/lottie.dart';
+import 'package:playschool/src/games/fairyTale/cubit/fairyTaleCubit.dart';
 import 'package:playschool/src/games/fairyTale/repository/fairyTaleList.dart';
 
+import '../../authentication/cubit/authCubit.dart';
+import '../../authentication/repository/AuthRepository.dart';
 import '../../common/component/color.dart';
+import '../repository/GameRepository.dart';
 
 class SelectFairyTaleScreen extends StatefulWidget {
   final FairyTaleInfo fairyTaleInfo;
@@ -42,70 +47,86 @@ class _SelectFairyTaleScreenState extends State<SelectFairyTaleScreen> {
 
     bool needsSafeArea = hasSafeArea(context);
 
-    return Scaffold(
-      extendBody: true,
-      body: Stack(
-        children: [
-          Opacity(
-            opacity: 0.15,
-            child: Image.asset("assets/background/main_bg.png"),
-          ),
-          Padding(
-            padding: EdgeInsets.symmetric(vertical: needsSafeArea ? 0 : 15.0),
-            child: SingleChildScrollView(
-              scrollDirection: Axis.vertical,
-              child: Column(
-                children: [
-                  _detailHeader(fairyTaleInfo: widget.fairyTaleInfo),
-                  const SizedBox(height: 15.0),
-                  _selectFactorList(
-                    iconPath: "assets/icon/character-design.png",
-                    listName: "등장인물",
-                    factors: widget.fairyTaleInfo.settingsFairyTale.characters,
-                    onSelected: (value) {
-                      setState(() {
-                        selectedCharacter = value;
-                      });
-                    },
-                    resetKey: _resetKey,
-                  ),
-                  const SizedBox(height: 15.0),
-                  _selectFactorList(
-                    iconPath: "assets/icon/action.png",
-                    listName: "행동",
-                    factors: widget.fairyTaleInfo.settingsFairyTale.actions,
-                    onSelected: (value) {
-                      setState(() {
-                        selectedAction = value;
-                      });
-                    },
-                    resetKey: _resetKey,
-                  ),
-                  const SizedBox(height: 15.0),
-                  _selectFactorList(
-                    iconPath: "assets/icon/background.png",
-                    listName: "배경",
-                    factors: widget.fairyTaleInfo.settingsFairyTale.backgrounds,
-                    onSelected: (value) {
-                      setState(() {
-                        selectedBackground = value;
-                      });
-                    },
-                    resetKey: _resetKey,
-                  ),
-                  const SizedBox(height: 90.0),
-                ],
-              ),
+    return BlocListener<FairyTaleCubit, FairyTaleState>(
+      listenWhen: (previous, current) => previous.fairyTaleStatus != current.fairyTaleStatus,
+      listener: (context, state) {
+        if (state.fairyTaleStatus == FairyTaleStatus.complete) {
+          if (context.canPop()) { context.pop(); }
+          context.read<AuthRepository>().userExpUp(context, context.read<AuthCubit>().state.token!);
+          context.read<GameRepository>().updateGame(context, 5, context.read<AuthCubit>().state.token!);
+
+          context.go("/completeFairyTaleBook", extra: {
+            "fairyTaleInfo" : widget.fairyTaleInfo,
+            "selectedCharacter" : selectedCharacter,
+            "selectedAction" : selectedAction,
+            "selectedBackground" : selectedBackground
+          });
+        }
+      },
+      child: Scaffold(
+        extendBody: true,
+        body: Stack(
+          children: [
+            Opacity(
+              opacity: 0.15,
+              child: Image.asset("assets/background/main_bg.png"),
             ),
-          )
-        ],
-      ),
-      bottomNavigationBar: _makeFairyTaleBtns(
-        fairyTaleInfo: widget.fairyTaleInfo,
-        selectedCharacter: selectedCharacter,
-        selectedAction: selectedAction,
-        selectedBackground: selectedBackground,
-        resetSelections: _resetSelections,
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: needsSafeArea ? 0 : 15.0),
+              child: SingleChildScrollView(
+                scrollDirection: Axis.vertical,
+                child: Column(
+                  children: [
+                    _detailHeader(fairyTaleInfo: widget.fairyTaleInfo),
+                    const SizedBox(height: 15.0),
+                    _selectFactorList(
+                      iconPath: "assets/icon/character-design.png",
+                      listName: "등장인물",
+                      factors: widget.fairyTaleInfo.settingsFairyTale.characters,
+                      onSelected: (value) {
+                        setState(() {
+                          selectedCharacter = value;
+                        });
+                      },
+                      resetKey: _resetKey,
+                    ),
+                    const SizedBox(height: 15.0),
+                    _selectFactorList(
+                      iconPath: "assets/icon/action.png",
+                      listName: "행동",
+                      factors: widget.fairyTaleInfo.settingsFairyTale.actions,
+                      onSelected: (value) {
+                        setState(() {
+                          selectedAction = value;
+                        });
+                      },
+                      resetKey: _resetKey,
+                    ),
+                    const SizedBox(height: 15.0),
+                    _selectFactorList(
+                      iconPath: "assets/icon/background.png",
+                      listName: "배경",
+                      factors: widget.fairyTaleInfo.settingsFairyTale.backgrounds,
+                      onSelected: (value) {
+                        setState(() {
+                          selectedBackground = value;
+                        });
+                      },
+                      resetKey: _resetKey,
+                    ),
+                    const SizedBox(height: 90.0),
+                  ],
+                ),
+              ),
+            )
+          ],
+        ),
+        bottomNavigationBar: _makeFairyTaleBtns(
+          selectedCharacter: selectedCharacter,
+          selectedAction: selectedAction,
+          selectedBackground: selectedBackground,
+          resetSelections: _resetSelections,
+        ),
       ),
     );
   }
@@ -335,7 +356,6 @@ class _selectFactorListState extends State<_selectFactorList> {
 }
 
 class _makeFairyTaleBtns extends StatelessWidget {
-  final FairyTaleInfo fairyTaleInfo;
   final SettingInfo? selectedCharacter;
   final SettingInfo? selectedAction;
   final SettingInfo? selectedBackground;
@@ -343,7 +363,6 @@ class _makeFairyTaleBtns extends StatelessWidget {
 
   const _makeFairyTaleBtns({
     super.key,
-    required this.fairyTaleInfo,
     required this.selectedCharacter,
     required this.selectedAction,
     required this.selectedBackground,
@@ -364,12 +383,7 @@ class _makeFairyTaleBtns extends StatelessWidget {
                   onPressed: () {
                     if(selectedCharacter != null && selectedAction != null && selectedBackground != null) {
                       _showWaitingDialog(context);
-                      // context.push("/completeFairyTaleBook", extra: {
-                      //   "fairyTaleInfo" : fairyTaleInfo,
-                      //   "selectedCharacter" : selectedCharacter,
-                      //   "selectedAction" : selectedAction,
-                      //   "selectedBackground" : selectedBackground
-                      // });
+                      context.read<FairyTaleCubit>().createFairy("", context.read<AuthCubit>().state.token!);
                     } else {
                       _showFailedDialog(context);
                     }

@@ -435,7 +435,7 @@ class _mainHeaderBottom extends StatelessWidget {
                   radius: const Radius.circular(20),
                   child: GestureDetector(
                     onTap: () {
-                      // context.push();
+                      context.push("/wordGame");
                     },
                     child: Container(
                       width: 132,
