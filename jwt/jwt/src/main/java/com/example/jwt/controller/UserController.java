@@ -96,7 +96,7 @@ public class UserController {
 
         User user = authService.getUserByToken(jwtToken);
         if(user.getExp() >= 5) {
-            return ResponseEntity.badRequest.body("이미 경험치가 5 입니다.");
+            return ResponseEntity.badRequest().body("이미 경험치가 5 입니다.");
         }
 
         user.setExp(user.getExp() + 1);
@@ -113,7 +113,7 @@ public class UserController {
         User user = authService.getUserByToken(jwtToken);
 
         if(user.getExp() < 5) {
-            return ResponseEntity.badRequest.body("경험치가 부족합니다.");
+            return ResponseEntity.badRequest().body("경험치가 부족합니다.");
         }
 
         user.setLevel(user.getLevel() + 1);
