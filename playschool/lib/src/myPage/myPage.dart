@@ -273,9 +273,13 @@ class _MyPageLevelPart extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.only(bottom: 18.0),
                 child: GestureDetector(
-                  onTap: () {
-                    context.read<AuthRepository>().userLevelUp(context, context.read<AuthCubit>().state.token!);
-                    _showLevelAlert(context);
+                  onTap: () async {
+                    final message = await context.read<AuthRepository>().userLevelUp(context, context.read<AuthCubit>().state.token!);
+                    if (message == "Success") {
+                      _showLevelAlert(context);
+                    } else {
+                      _showLevelFaliledAlert(context);
+                    }
                   },
                   child: Container(
                     width: 80,
@@ -357,7 +361,7 @@ class _MyPageLevelPart extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisSize: MainAxisSize.min,
               children: [
-                Lottie.asset("assets/lottie/failed.json",
+                Lottie.asset("assets/lottie/levelup.json",
                   width: 150,
                   height: 150,
                 ),
@@ -377,6 +381,59 @@ class _MyPageLevelPart extends StatelessWidget {
                   ),
                 ),
                 Text("정말 축하해~",
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 17,
+                      color: TEXT_COLOR
+                  ),
+                ),
+              ],
+            ),
+          );
+        }
+    );
+  }
+
+  void _showLevelFaliledAlert(BuildContext context) {
+    showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          Future.delayed(const Duration(seconds: 3), () {
+            if(Navigator.of(context).canPop()) {
+              Navigator.of(context).pop();
+            }
+          });
+
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16), // 모서리 둥글게
+            ),
+            backgroundColor: BG_COLOR,
+            content: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Lottie.asset("assets/lottie/failed.json",
+                  width: 150,
+                  height: 150,
+                ),
+                const SizedBox(height: 10),
+                Text("☹️️실패!! 😰",
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 17,
+                      color: Y_TEXT_COLOR
+                  ),
+                ),
+                Text("경험치가 부족해... ㅠㅠ",
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 17,
+                      color: TEXT_COLOR
+                  ),
+                ),
+                Text("경험치를 채우고 다시 시도해봐~",
                   style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 17,
