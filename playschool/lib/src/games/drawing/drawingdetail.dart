@@ -18,6 +18,18 @@ class DrawingDetailScreen extends StatefulWidget {
   State<DrawingDetailScreen> createState() => _DrawingDetailScreenState();
 }
 
+class WordImagePair {
+  final String word;
+  final String imagePath;
+
+  WordImagePair({required this.word, required this.imagePath});
+}
+
+List<WordImagePair> items = [
+  WordImagePair(word: "다람쥐", imagePath: "assets/images/apple.png"),
+  WordImagePair(word: "banana", imagePath: "assets/images/banana.png"),
+];
+
 class _DrawingDetailScreenState extends State<DrawingDetailScreen> {
   @override
   Widget build(BuildContext context) {
@@ -43,7 +55,7 @@ class _DrawingDetailScreenState extends State<DrawingDetailScreen> {
                 height: screenHeight,
                 child: Stack(
                   children: [
-                    // 🎨 배경 이미지
+                    // 배경 이미지
                     Positioned(
                       top: screenHeight * 0.13,
                       left: screenWidth * 0.02,
@@ -67,7 +79,7 @@ class _DrawingDetailScreenState extends State<DrawingDetailScreen> {
                       ),
                     ),
 
-                    // 🖼️ 이젤 이미지
+                    // 이젤 이미지
                     Align(
                       alignment: Alignment.topCenter,
                       child: Padding(
@@ -81,7 +93,7 @@ class _DrawingDetailScreenState extends State<DrawingDetailScreen> {
                       ),
                     ),
 
-                    // 🖌️ 캔버스
+                    //  캔버스
                     Positioned(
                       top: screenHeight * 0.22,
                       left: screenWidth * 0.16,
@@ -92,7 +104,7 @@ class _DrawingDetailScreenState extends State<DrawingDetailScreen> {
                       ),
                     ),
 
-                    // 🔲 오버레이 이미지
+                    // 오버레이 이미지
                     Align(
                       alignment: Alignment.topCenter,
                       child: Padding(
@@ -111,7 +123,7 @@ class _DrawingDetailScreenState extends State<DrawingDetailScreen> {
                       ),
                     ),
 
-                    // 🧱 이름 텍스트
+                    // 이름 텍스트
                     Align(
                       alignment: Alignment.topCenter,
                       child: Padding(
@@ -126,7 +138,7 @@ class _DrawingDetailScreenState extends State<DrawingDetailScreen> {
                       ),
                     ),
 
-                    // ⬆️ 상단 툴바 (뒤로가기 + undo + 저장 아이콘)
+                    // 상단 툴바 (뒤로가기 + undo + 저장 아이콘)
                     Column(
                       children: [
                         const SizedBox(height: 50),

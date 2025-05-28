@@ -60,6 +60,7 @@ dependencies:
   opencv_dart: ^1.4.1
   pigeon: ^25.3.1
   device_info_plus: ^11.4.0
+  flip_card: ^0.7.0
 
 dev_dependencies:
   flutter_test:
