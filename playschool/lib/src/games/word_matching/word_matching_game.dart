@@ -27,7 +27,7 @@ class WordMatching extends StatelessWidget {
               constraints: BoxConstraints(
                 minHeight: MediaQuery.of(context).size.height +100,
               ),
-              child: Column(
+              child: Column( // ✅ 여기가 child에 해당됨!
                 children: [
                   const _MyPageHeader(),
                   const SizedBox(height: 30),
@@ -40,7 +40,7 @@ class WordMatching extends StatelessWidget {
                         crossAxisCount: 3,
                         mainAxisSpacing: 14,
                         crossAxisSpacing: 14,
-                        childAspectRatio: 0.8,
+                        childAspectRatio: 0.8, // ✅ 세로 공간 확보
                       ),
 
                       itemCount: items.length,
@@ -50,8 +50,7 @@ class WordMatching extends StatelessWidget {
                           onTap: () {
                             context.push(
                               '/word_matching_detail',
-                              extra: {'label': item['label'],
-                                      'img': item['img']},
+                              extra: {'label': item['label']},
                             );
                           },
                           child: buildItemCard(item['img'], item['color'], item['label']),
@@ -232,7 +231,10 @@ final List<Map<String, dynamic>> items = [
   {"img": "assets/icon/number-blocks.png", "color": Colors.yellow.shade100, "label": "숫자"},
   {"img": "assets/icon/job.png", "color": Colors.purple.shade100, "label": "직업 탐험"},
   {"img": "assets/icon/public-transport.png", "color": Colors.teal.shade100, "label": "교통수단"},
+  {"img": "assets/icon/shapes.png", "color": Colors.pink.shade100, "label": "도형"},
   {"img": "assets/icon/body.png", "color": Colors.orange.shade100, "label": "몸"},
+  {"img": "assets/icon/animal.png", "color": Colors.lightBlue.shade100, "label": "토끼"},
+  {"img": "assets/icon/bear.png", "color": Colors.green.shade100, "label": "곰"},
 
 ];
 

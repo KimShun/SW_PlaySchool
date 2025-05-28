@@ -205,8 +205,7 @@ final GoRouter _router = GoRouter(
       path: '/word_matching_detail',
       builder: (context, state) {
         final label = (state.extra as Map?)?['label'] ?? '';
-        final img = (state.extra as Map?)?['img'] ?? '';
-        return WordMatchingDetail(label: label, img: img);
+        return WordMatchingDetail(label: label);
       },
     ),
   ]
