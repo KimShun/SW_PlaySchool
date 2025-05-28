@@ -85,7 +85,7 @@ class AuthRepository {
     }
   }
 
-  Future<void> userLevelUp(BuildContext context, String token) async {
+  Future<String> userLevelUp(BuildContext context, String token) async {
     final response = await http.patch(
       Uri.parse("$baseUrl/api/auth/levelup"),
       headers: {
@@ -95,6 +95,9 @@ class AuthRepository {
 
     if (response.statusCode == 200) {
       context.read<UserCubit>().userLevelUp();
+      return "Success";
+    } else {
+      return "Failed";
     }
   }
 }

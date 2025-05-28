@@ -96,6 +96,11 @@ flutter:
     - assets/background/
     - assets/lottie/
     - assets/bgm/
+    - assets/detail/dance/
+    - assets/detail/wordgame/
+    - assets/detail/fairytale/
+    - assets/detail/findwrong/
+    - assets/detail/paint/
     #- assets/video/
 
   # An image asset can refer to one or more resolution-specific "variants", see

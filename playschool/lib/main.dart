@@ -25,6 +25,8 @@ import 'package:playschool/src/games/dance/selectDance.dart';
 import 'package:playschool/src/games/drawing/drawingGame.dart';
 import 'package:playschool/src/games/drawing/drawingdetail.dart';
 import 'package:playschool/src/games/fairyTale/completeFairyTale.dart';
+import 'package:playschool/src/games/fairyTale/cubit/fairyTaleCubit.dart';
+import 'package:playschool/src/games/fairyTale/repository/FairyTaleRepository.dart';
 import 'package:playschool/src/games/fairyTale/repository/fairyTaleList.dart';
 import 'package:playschool/src/games/fairyTale/makeFairyTale.dart';
 import 'package:playschool/src/games/fairyTale/selectFairyTale.dart';
@@ -61,6 +63,7 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   final baseUrl = "https://sw-playschool.onrender.com";
   final danceApiUrl = "https://sw-playschool-danceapi.onrender.com";
+  final fairyApiUrl = "https://sw-playschool-fairyapi.onrender.com";
 
   @override
   Widget build(BuildContext context) {
@@ -69,6 +72,7 @@ class _MyAppState extends State<MyApp> {
         RepositoryProvider(create: (context) => AuthRepository(baseUrl: baseUrl)),
         RepositoryProvider(create: (context) => GameRepository(baseUrl: baseUrl)),
         RepositoryProvider(create: (context) => DanceRepository(baseUrl: danceApiUrl)),
+        RepositoryProvider(create: (context) => FairyTaleRepository(baseUrl: fairyApiUrl)),
       ],
       child: MultiBlocProvider(
         providers: [
@@ -78,6 +82,7 @@ class _MyAppState extends State<MyApp> {
           BlocProvider(create: (context) => WordCubit()),
           BlocProvider(create: (context) => PopDanceCubit()),
           BlocProvider(create: (context) => DanceCubit(danceRepository: context.read<DanceRepository>())),
+          BlocProvider(create: (context) => FairyTaleCubit(fairyTaleRepository: context.read<FairyTaleRepository>()))
         ],
         child: BlocListener<AuthCubit, AuthState>(
           listener: (context, state) {
@@ -96,12 +101,12 @@ class _MyAppState extends State<MyApp> {
 }
 
 final GoRouter _router = GoRouter(
-  initialLocation: "/word_matching",
+  initialLocation: "/login",
   redirect: (context, state) {
-    // final authState = context.read<AuthCubit>().state;
-    // if (authState.authStatus == AuthStatus.complete && state.topRoute!.path == "/login") {
-    //   return "/";
-    // }
+    final authState = context.read<AuthCubit>().state;
+    if (authState.authStatus == AuthStatus.complete && state.topRoute!.path == "/login") {
+      return "/";
+    }
 
     return null;
   },
@@ -124,11 +129,11 @@ final GoRouter _router = GoRouter(
     ),
     GoRoute(
       path: "/puzzleGame",
-      builder: (context, state) => const PuzzleGame(),
+      builder: (context, state) => const PuzzleGameScreen(),
     ),
     GoRoute(
       path: "/wordGame",
-      builder: (context, state) => const wordGame(),
+      builder: (context, state) => const WordGameScreen(),
     ),
     GoRoute(
       path: "/detailGame",
@@ -166,9 +171,9 @@ final GoRouter _router = GoRouter(
     GoRoute(
       path: "/completeFairyTaleBook",
       builder: (context, state) {
-        // final args = state.extra as Map<String, dynamic>?;
-        // return CompleteFairyTaleScreen(args: args!);
-        return CompleteFairyTaleScreen();
+        final args = state.extra as Map<String, dynamic>?;
+        return CompleteFairyTaleScreen(args: args!);
+        // return CompleteFairyTaleScreen();
       },
     ),
     GoRoute(
@@ -204,9 +209,5 @@ final GoRouter _router = GoRouter(
         return WordMatchingDetail(label: label, img: img);
       },
     ),
-
-
-
-
   ]
 );

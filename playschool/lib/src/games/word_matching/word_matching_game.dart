@@ -54,7 +54,6 @@ class WordMatching extends StatelessWidget {
                                       'img': item['img']},
                             );
                           },
-
                           child: buildItemCard(item['img'], item['color'], item['label']),
                         );
                       },

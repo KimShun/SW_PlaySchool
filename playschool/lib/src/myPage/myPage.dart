@@ -3,8 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:linear_progress_bar/linear_progress_bar.dart';
+import 'package:lottie/lottie.dart';
+import 'package:playschool/src/authentication/repository/AuthRepository.dart';
 import 'package:playschool/src/common/component/color.dart';
 
+import '../authentication/cubit/authCubit.dart';
 import '../authentication/cubit/userCubit.dart';
 import '../authentication/model/User.dart';
 
@@ -13,39 +16,43 @@ class MyPageScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final userData = context.read<UserCubit>().state!;
+    return BlocBuilder<UserCubit, User?>(
+      builder: (context, state) {
+        final userData = state!;
 
-    return Scaffold(
-      extendBody: true,
-      body: Stack(
-        children: [
-          Opacity(
-            opacity: 0.15,
-            child: Image.asset("assets/background/main_bg.png"),
-          ),
-          SingleChildScrollView(
-            scrollDirection: Axis.vertical,
-            child: Column(
-              children: [
-                // Header 영역
-                _MyPageHeader(userData: userData),
-                // Level 영역
-                _MyPageLevelPart(userData: userData,),
-                // 경계선
-                Divider(
-                  color: MYPAGE_STROKE_COLOR,
-                  indent: 26,
-                  endIndent: 26,
+        return Scaffold(
+          extendBody: true,
+          body: Stack(
+            children: [
+              Opacity(
+                opacity: 0.15,
+                child: Image.asset("assets/background/main_bg.png"),
+              ),
+              SingleChildScrollView(
+                scrollDirection: Axis.vertical,
+                child: Column(
+                  children: [
+                    // Header 영역
+                    _MyPageHeader(userData: userData),
+                    // Level 영역
+                    _MyPageLevelPart(userData: userData,),
+                    // 경계선
+                    Divider(
+                      color: MYPAGE_STROKE_COLOR,
+                      indent: 26,
+                      endIndent: 26,
+                    ),
+                    // 많이 플레이 영역
+                    _BestPlayShow(),
+                    // 추천하는 게임 영역
+                    _RecommendGameContent()
+                  ],
                 ),
-                // 많이 플레이 영역
-                _BestPlayShow(),
-                // 추천하는 게임 영역
-                _RecommendGameContent()
-              ],
-            ),
-          )
-        ],
-      ),
+              )
+            ],
+          ),
+        );
+      }
     );
   }
 }
@@ -265,20 +272,30 @@ class _MyPageLevelPart extends StatelessWidget {
               ),
               Padding(
                 padding: const EdgeInsets.only(bottom: 18.0),
-                child: Container(
-                  width: 80,
-                  height: 50,
-                  decoration: BoxDecoration(
-                      border: Border.all(color: MYPAGE_STROKE_COLOR, width: 1),
-                      borderRadius: BorderRadius.circular(15),
-                      color: MYPAGE_TEXT_S_COLOR
-                  ),
-                  child: const Center(
-                    child: Text("UP!!",
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18.0
+                child: GestureDetector(
+                  onTap: () async {
+                    final message = await context.read<AuthRepository>().userLevelUp(context, context.read<AuthCubit>().state.token!);
+                    if (message == "Success") {
+                      _showLevelAlert(context);
+                    } else {
+                      _showLevelFaliledAlert(context);
+                    }
+                  },
+                  child: Container(
+                    width: 80,
+                    height: 50,
+                    decoration: BoxDecoration(
+                        border: Border.all(color: MYPAGE_STROKE_COLOR, width: 1),
+                        borderRadius: BorderRadius.circular(15),
+                        color: MYPAGE_TEXT_S_COLOR
+                    ),
+                    child: const Center(
+                      child: Text("UP!!",
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18.0
+                        ),
                       ),
                     ),
                   ),
@@ -321,6 +338,112 @@ class _MyPageLevelPart extends StatelessWidget {
           )
         )
       ],
+    );
+  }
+
+  void _showLevelAlert(BuildContext context) {
+    showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          Future.delayed(const Duration(seconds: 3), () {
+            if(Navigator.of(context).canPop()) {
+              Navigator.of(context).pop();
+            }
+          });
+
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16), // 모서리 둥글게
+            ),
+            backgroundColor: BG_COLOR,
+            content: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Lottie.asset("assets/lottie/levelup.json",
+                  width: 150,
+                  height: 150,
+                ),
+                const SizedBox(height: 10),
+                Text("✌️ 레벨 업!! 👍",
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 17,
+                      color: Y_TEXT_COLOR
+                  ),
+                ),
+                Text("레벨이 올라갔어!!",
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 17,
+                      color: TEXT_COLOR
+                  ),
+                ),
+                Text("정말 축하해~",
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 17,
+                      color: TEXT_COLOR
+                  ),
+                ),
+              ],
+            ),
+          );
+        }
+    );
+  }
+
+  void _showLevelFaliledAlert(BuildContext context) {
+    showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          Future.delayed(const Duration(seconds: 3), () {
+            if(Navigator.of(context).canPop()) {
+              Navigator.of(context).pop();
+            }
+          });
+
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16), // 모서리 둥글게
+            ),
+            backgroundColor: BG_COLOR,
+            content: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Lottie.asset("assets/lottie/failed.json",
+                  width: 150,
+                  height: 150,
+                ),
+                const SizedBox(height: 10),
+                Text("☹️️실패!! 😰",
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 17,
+                      color: Y_TEXT_COLOR
+                  ),
+                ),
+                Text("경험치가 부족해... ㅠㅠ",
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 17,
+                      color: TEXT_COLOR
+                  ),
+                ),
+                Text("경험치를 채우고 다시 시도해봐~",
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 17,
+                      color: TEXT_COLOR
+                  ),
+                ),
+              ],
+            ),
+          );
+        }
     );
   }
 }

@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:camera/camera.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -22,16 +25,42 @@ class CompleteDanceScreen extends StatefulWidget {
 }
 
 class _CompleteDanceScreenState extends State<CompleteDanceScreen> {
-  late VideoPlayerController videoController;
+  VideoPlayerController? videoController;
+  bool isVideoInitialized = false;
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    videoController = VideoPlayerController.asset(context.read<DanceCubit>().state.recordVideo!.path);
-    videoController.setPlaybackSpeed(1.5);
-    videoController.setVolume(0.5);
-    videoController.play();
+    _initializeVideoController();
+  }
+
+  void _initializeVideoController() async {
+    final recordVideo = context.read<DanceCubit>().state.recordVideo;
+    if (recordVideo == null) return;
+
+    try {
+      videoController = VideoPlayerController.file(File(recordVideo.path));
+      await videoController!.setPlaybackSpeed(1.5);
+      await videoController!.setVolume(0.5);
+      await videoController!.setLooping(true);
+      await videoController!.initialize();
+
+      if (mounted) {
+        setState(() {
+          isVideoInitialized = true;
+          videoController!.play();
+        });
+      }
+    } catch (e) {
+      print('비디오 초기화 오류: $e');
+      // 오류 처리 로직 추가
+    }
+  }
+
+  @override
+  void dispose() {
+    videoController?.dispose();
+    super.dispose();
   }
 
   @override
@@ -42,6 +71,12 @@ class _CompleteDanceScreenState extends State<CompleteDanceScreen> {
     }
 
     bool needsSafeArea = hasSafeArea(context);
+
+    print(context.read<DanceCubit>().state.danceAPI!.totalScore);
+    print(context.read<DanceCubit>().state.danceAPI!.similarityScore);
+    print(context.read<DanceCubit>().state.danceAPI!.movementScore);
+
+    print("Check!!: ${context.read<DanceCubit>().state.recordVideo!.path}");
 
     return Scaffold(
       extendBody: true,
@@ -59,7 +94,8 @@ class _CompleteDanceScreenState extends State<CompleteDanceScreen> {
                 _Header(
                   needsSafeArea: needsSafeArea,
                   danceInfo: widget.danceInfo,
-                  videoController: videoController,
+                  videoController: videoController!,
+                  isVideoInitialized: isVideoInitialized,
                 ),
                 const SizedBox(height: 10),
                 // 별 점수 영역
@@ -80,13 +116,15 @@ class _CompleteDanceScreenState extends State<CompleteDanceScreen> {
 class _Header extends StatelessWidget {
   final bool needsSafeArea;
   final DanceInfo danceInfo;
-  final VideoPlayerController videoController;
+  final VideoPlayerController? videoController;
+  final bool isVideoInitialized;
 
   const _Header({
     super.key,
     required this.needsSafeArea,
     required this.danceInfo,
     required this.videoController,
+    required this.isVideoInitialized,
   });
 
   @override
@@ -152,17 +190,17 @@ class _Header extends StatelessWidget {
                     ),
                     const SizedBox(height: 18),
                     DottedBorder(
-                        color: EXERCISE_STROKE_COLOR,
-                        borderType: BorderType.RRect,
-                        radius: const Radius.circular(30),
-                        child: Container(
-                          height: 210,
-                          decoration: BoxDecoration(
-                            color: EXERCISE_CARD_COLOR,
-                            borderRadius: BorderRadius.circular(30)
-                          ),
-                          child: VideoPlayer(videoController),
-                        )
+                      color: EXERCISE_STROKE_COLOR,
+                      borderType: BorderType.RRect,
+                      radius: const Radius.circular(30),
+                      child: Container(
+                        height: 210,
+                        decoration: BoxDecoration(
+                          color: EXERCISE_CARD_COLOR,
+                          borderRadius: BorderRadius.circular(30)
+                        ),
+                        child: _buildVideoPlayer(),
+                      ),
                     ),
                   ],
                 ),
@@ -186,6 +224,34 @@ class _Header extends StatelessWidget {
       ),
     );
   }
+
+  Widget _buildVideoPlayer() {
+    if (videoController == null) {
+      return const Center(
+        child: Text(
+          '비디오를 찾을 수 없습니다',
+          style: TextStyle(color: Colors.white),
+        ),
+      );
+    }
+
+    if (!isVideoInitialized) {
+      return const Center(
+        child: CircularProgressIndicator(color: Colors.green),
+      );
+    }
+
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(30.0),
+      child: RotatedBox(
+        quarterTurns: 3,
+        child: AspectRatio(
+          aspectRatio: videoController!.value.aspectRatio,
+          child: VideoPlayer(videoController!),
+        ),
+      ),
+    );
+  }
 }
 
 class _StarScore extends StatelessWidget {
@@ -201,7 +267,7 @@ class _StarScore extends StatelessWidget {
                 ? _StarIconThree() : context.read<DanceCubit>().state.danceAPI!.totalScore >= 50
                 ? _StarIconTwo() : _StarIconOne(),
             const SizedBox(height: 10.0),
-            Text("💕 점수: ${context.read<DanceCubit>().state.danceAPI!.totalScore}점 💕",
+            Text("💕 점수: ${(context.read<DanceCubit>().state.danceAPI!.totalScore).toInt()}점 💕",
               style: TextStyle(
                   color: EXERCISE_TEXT_COLOR,
                   fontWeight: FontWeight.bold,
@@ -373,15 +439,15 @@ class _AssessmentContent extends StatelessWidget {
           // 정확도
           _percentAssessment(
             context.read<DanceCubit>().state.danceAPI!.similarityScore / 100,
-            "${context.read<DanceCubit>().state.danceAPI!.similarityScore}점",
+            "${(context.read<DanceCubit>().state.danceAPI!.similarityScore).toInt()}점",
             "정확도",
             context.read<DanceCubit>().state.danceAPI!.similarityContent
           ),
           const SizedBox(height: 20.0),
           // 열정적
           _percentAssessment(
-              context.read<DanceCubit>().state.danceAPI!.movementScore / 100,
-            "${context.read<DanceCubit>().state.danceAPI!.movementScore}점",
+              context.read<DanceCubit>().state.danceAPI!.movementScore / 1000,
+            "${(context.read<DanceCubit>().state.danceAPI!.movementScore / 10).toInt()}점",
             "열정적",
             context.read<DanceCubit>().state.danceAPI!.movementContent
           ),

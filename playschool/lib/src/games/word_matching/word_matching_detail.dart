@@ -220,6 +220,12 @@ class _MyPageHeader extends StatelessWidget {
                 child: Image.asset("assets/icon/exit.png", width: 40, height: 40),
               ),
 
+              Positioned(
+                top: 16,
+                right: 18,
+                child: buildLifeBar(),
+              ),
+
               Column(
                 children: [
                   const SizedBox(height: 45),

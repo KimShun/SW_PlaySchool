@@ -27,10 +27,28 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  bool showToolTip = false;
+  bool iconClicked = false;
+
+  void handleAskTap() {
+    setState(() {
+      showToolTip = true;
+      iconClicked = true;
+    });
+
+    Future.delayed(const Duration(seconds: 2), () {
+      if (mounted) {
+        setState(() {
+          showToolTip = false;
+          iconClicked = false;
+        });
+      }
+    });
+  }
+
   @override
   Widget _buildHomeScreen(BuildContext context) {
     final userData = context.read<UserCubit>().state!;
-
     bool hasSafeArea(BuildContext context) {
       final padding = MediaQuery.of(context).padding;
       return padding.top > 20;
@@ -163,7 +181,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               itemCount: playTypeList.length,
                               separatorBuilder: (context, index) => const SizedBox(width: 20),
                               itemBuilder: (context, index) {
-                                return _gamePlayBtn(context, playTypeList[index]);
+                                return _gamePlayBtn(gameData: playTypeList[index]);
                               }
                             ),
                           )
@@ -189,7 +207,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               itemCount: entTypeList.length,
                               separatorBuilder: (context, index) => const SizedBox(width: 20),
                               itemBuilder: (context, index) {
-                                return _gamePlayBtn(context, entTypeList[index]);
+                                return _gamePlayBtn(gameData: entTypeList[index]);
                               }
                             ),
                           )
@@ -215,7 +233,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               itemCount: makeTypeList.length,
                               separatorBuilder: (context, index) => const SizedBox(width: 20),
                               itemBuilder: (context, index) {
-                                return _gamePlayBtn(context, makeTypeList[index]);
+                                return _gamePlayBtn(gameData: makeTypeList[index]);
                               }
                             ),
                           )
@@ -231,66 +249,176 @@ class _HomeScreenState extends State<HomeScreen> {
       )
     );
   }
+}
 
-  Widget _gamePlayBtn(BuildContext context, GameData gameData) {
+class _gamePlayBtn extends StatefulWidget {
+  final GameData gameData;
+  const _gamePlayBtn({
+    super.key,
+    required this.gameData,
+  });
+
+  @override
+  State<_gamePlayBtn> createState() => _gamePlayBtnState();
+}
+
+class _gamePlayBtnState extends State<_gamePlayBtn> {
+  bool showToolTip = false;
+  bool iconClicked = false;
+
+  void handleAskTap() {
+    setState(() {
+      showToolTip = true;
+      iconClicked = true;
+    });
+
+    Future.delayed(const Duration(seconds: 3), () {
+      if (mounted) {
+        setState(() {
+          showToolTip = false;
+          iconClicked = false;
+        });
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return SizedBox(
       width: 90,
-      height: 130,
-      child: Column(
+      height: 150, // 살짝 높게 잡음
+      child: Stack(
+        clipBehavior: Clip.none, // Positioned로 넘치는 말풍선 허용
         children: [
-          Align(
-            alignment: Alignment.topRight,
-            child: GestureDetector(
-              onTap: () {},
-              child: Image.asset("assets/icon/ask.png",
-                width: 20,
-                height: 20,
-              ),
-            )
-          ),
-          Stack(
+          // 기존 Column 내용
+          Column(
             children: [
-              GestureDetector(
-                onTap: () {
-                  context.push("/detailGame", extra: gameData);
-                },
-                child: DottedBorder(
-                  color: const Color(0xFF000000),
-                  borderType: BorderType.Circle,
-                  child: CircleAvatar(
-                    radius: 40,
-                    backgroundImage: AssetImage(gameData.gameIconPath)
+              Align(
+                alignment: Alignment.topRight,
+                child: GestureDetector(
+                  onTap: handleAskTap,
+                  child: Image.asset(
+                    iconClicked
+                        ? "assets/icon/click_ask.png"
+                        : "assets/icon/ask.png",
+                    width: 20,
+                    height: 20,
                   ),
                 ),
               ),
-              if(!gameData.isAvailable)
-                DottedBorder(
-                  color: const Color(0xFF000000),
-                  borderType: BorderType.Circle,
-                  child: CircleAvatar(
-                    radius: 40,
-                    backgroundColor: Colors.grey.withOpacity(0.5),
-                    child: Image.asset("assets/icon/padlock.png",
-                      width: 45,
-                      height: 45
-                    )
+              // const SizedBox(height: 4),
+              Stack(
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      context.push("/detailGame", extra: widget.gameData);
+                    },
+                    child: DottedBorder(
+                      color: const Color(0xFF000000),
+                      borderType: BorderType.Circle,
+                      child: CircleAvatar(
+                        radius: 40,
+                        backgroundImage:
+                        AssetImage(widget.gameData.gameIconPath),
+                      ),
+                    ),
                   ),
-                )
+                  if (!widget.gameData.isAvailable)
+                    DottedBorder(
+                      color: const Color(0xFF000000),
+                      borderType: BorderType.Circle,
+                      child: CircleAvatar(
+                        radius: 40,
+                        backgroundColor: Colors.grey.withOpacity(0.5),
+                        child: Image.asset("assets/icon/padlock.png",
+                            width: 45, height: 45),
+                      ),
+                    )
+                ],
+              ),
+              const SizedBox(height: 5),
+              Text(
+                widget.gameData.name,
+                style: TextStyle(
+                  color: TEXT_COLOR,
+                  fontSize: 14.0,
+                  fontWeight: FontWeight.w600),
+              )
             ],
           ),
-          const SizedBox(height: 5),
-          Text(gameData.name,
-            style: TextStyle(
-              color: TEXT_COLOR,
-              fontSize: 14.0,
-              fontWeight: FontWeight.w600
+
+          if (showToolTip)
+            Positioned(
+              right: -150,
+              top: -30,
+              child: Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  // 📦 말풍선 본체
+                  Container(
+                    constraints: const BoxConstraints(maxWidth: 140),
+                    padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                    decoration: BoxDecoration(
+                      color: Colors.amber[100],
+                      border: Border.all(color: Colors.brown.shade200, width: 1),
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.brown.withOpacity(0.2),
+                          blurRadius: 4,
+                          offset: const Offset(2, 3),
+                        ),
+                      ],
+                    ),
+                    child: Text(
+                      widget.gameData.shortDetail,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                        color: Color(0xFF444444),
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 3,
+                    ),
+                  ),
+
+                  // 🔺 왼쪽 꼬리
+                  Positioned(
+                    left: 10,
+                    bottom: -6,
+                    child: ClipPath(
+                      clipper: _LeftTailClipper(),
+                      child: Container(
+                        width: 12,
+                        height: 8,
+                        color: Colors.amber[100],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
-          )
         ],
       ),
     );
   }
 }
+
+class _LeftTailClipper extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    final path = Path();
+    path.moveTo(size.width / 2, 0);     // top center
+    path.lineTo(0, size.height);        // bottom left
+    path.lineTo(size.width, size.height); // bottom right
+    path.close();
+    return path;
+  }
+
+  @override
+  bool shouldReclip(CustomClipper<Path> oldClipper) => false;
+}
+
 
 class _mainHeaderTop extends StatelessWidget {
   final User userData;
@@ -435,7 +563,9 @@ class _mainHeaderBottom extends StatelessWidget {
                   radius: const Radius.circular(20),
                   child: GestureDetector(
                     onTap: () {
-                      // context.push();
+                      if (userData.todayGame1) {
+                        context.push("/wordGame");
+                      }
                     },
                     child: Container(
                       width: 132,

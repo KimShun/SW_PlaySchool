@@ -6,16 +6,18 @@ import 'package:playschool/src/authentication/cubit/authCubit.dart';
 import 'package:playschool/src/common/component/color.dart';
 import 'package:playschool/src/games/repository/GameRepository.dart';
 
+import '../../../authentication/cubit/userCubit.dart';
+import '../../../authentication/repository/AuthRepository.dart';
 import 'cubit/puzzleCubit.dart';
 
-class PuzzleGame extends StatefulWidget {
-  const PuzzleGame({super.key});
+class PuzzleGameScreen extends StatefulWidget {
+  const PuzzleGameScreen({super.key});
 
   @override
-  State<PuzzleGame> createState() => _PuzzleGameState();
+  State<PuzzleGameScreen> createState() => _PuzzleGameState();
 }
 
-class _PuzzleGameState extends State<PuzzleGame> {
+class _PuzzleGameState extends State<PuzzleGameScreen> {
   @override
   void didChangeDependencies() {
     // TODO: implement didChangeDependencies
@@ -30,6 +32,10 @@ class _PuzzleGameState extends State<PuzzleGame> {
       body: BlocListener<PuzzleCubit, PuzzleState>(
         listener: (context, state) async {
           if (state.status == PuzzleStatus.completed) {
+            if(!context.read<UserCubit>().state!.todayGame1) {
+              await context.read<AuthRepository>().userExpUp(context, context.read<AuthCubit>().state.token!);
+            }
+
             _showVictoryDialog(context);
             await context.read<GameRepository>().updateTodayGame(context, 1, context.read<AuthCubit>().state.token!);
           }

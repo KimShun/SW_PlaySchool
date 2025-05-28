@@ -1,22 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lottie/lottie.dart';
+import 'package:playschool/src/authentication/cubit/userCubit.dart';
+import 'package:playschool/src/authentication/repository/AuthRepository.dart';
 import 'package:playschool/src/games/today/configure.dart';
 import 'package:playschool/src/games/today/wordGame/cubit/wordCubit.dart';
 
+import '../../../authentication/cubit/authCubit.dart';
 import '../../../common/component/color.dart';
+import '../../repository/GameRepository.dart';
 
-class wordGame extends StatelessWidget {
-  const wordGame({super.key});
+class WordGameScreen extends StatelessWidget {
+  const WordGameScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       extendBody: true,
       body: BlocListener<WordCubit, WordState>(
-        listener: (context, state) {
+        listener: (context, state) async {
           if (state.status == WordStatus.completed) {
+            if(!context.read<UserCubit>().state!.todayGame2) {
+              await context.read<AuthRepository>().userExpUp(context, context.read<AuthCubit>().state.token!);
+            }
+
             _showVictoryDialog(context);
+            await context.read<GameRepository>().updateTodayGame(context, 2, context.read<AuthCubit>().state.token!);
           } else if (state.status == WordStatus.failed) {
             _showFailedDialog(context);
           }
