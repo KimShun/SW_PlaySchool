@@ -1,5 +1,7 @@
+import 'package:card_swiper/card_swiper.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_card_swiper/flutter_card_swiper.dart';
 import 'package:playschool/src/common/component/color.dart';
 import 'package:playschool/src/common/detailGame/gameInfo.dart';
 import 'package:go_router/go_router.dart';
@@ -40,8 +42,6 @@ class DetailGameScreen extends StatelessWidget {
                   _detailButtons(gameData: gameData),
                   const SizedBox(height: 15),
                   _detailDescription(gameData: gameData),
-                  const SizedBox(height: 15),
-                  _detailPreview(gameData: gameData),
                   const SizedBox(height: 15),
                   _detailDifficult(gameData: gameData),
                 ],
@@ -107,11 +107,11 @@ class _detailHeader extends StatelessWidget {
                             children: [
                               Text(gameData.name,
                                 style: TextStyle(
-                                    color: gameData.gameType == GameType.play
-                                      ? Y_TEXT_COLOR : gameData.gameType == GameType.ent
-                                      ? EXERCISE_TEXT_COLOR : MAKE_TEXT_COLOR,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 25.0
+                                  color: gameData.gameType == GameType.play
+                                    ? Y_TEXT_COLOR : gameData.gameType == GameType.ent
+                                    ? EXERCISE_TEXT_COLOR : MAKE_TEXT_COLOR,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 25.0
                                 ),
                               ),
                               Text(gameData.shortDetail,
@@ -129,20 +129,62 @@ class _detailHeader extends StatelessWidget {
                   ),
                   const SizedBox(height: 18),
                   DottedBorder(
-                      color: gameData.gameType == GameType.play
-                          ? PLAY_STROKE_COLOR : gameData.gameType == GameType.ent
-                          ? EXERCISE_STROKE_COLOR : MAKE_STROKE_COLOR,
-                      borderType: BorderType.RRect,
-                      radius: const Radius.circular(30),
-                      child: Container(
-                        height: 210,
-                        decoration: BoxDecoration(
-                            color: gameData.gameType == GameType.play
-                                ? PLAY_CARD_COLOR : gameData.gameType == GameType.ent
-                                ? EXERCISE_CARD_COLOR : MAKE_CARD_COLOR,
-                            borderRadius: BorderRadius.circular(30)
+                    color: gameData.gameType == GameType.play
+                      ? PLAY_STROKE_COLOR : gameData.gameType == GameType.ent
+                      ? EXERCISE_STROKE_COLOR : MAKE_STROKE_COLOR,
+                    borderType: BorderType.RRect,
+                    radius: const Radius.circular(30),
+                    child: Container(
+                      height: 210,
+                      decoration: BoxDecoration(
+                        color: gameData.gameType == GameType.play
+                          ? PLAY_CARD_COLOR : gameData.gameType == GameType.ent
+                          ? EXERCISE_CARD_COLOR : MAKE_CARD_COLOR,
+                        borderRadius: BorderRadius.circular(30)
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Swiper(
+                          autoplay: true,
+                          scale: 0.8,
+                          itemCount: gameData.detailImagePath.length,
+                          pagination: SwiperPagination(
+                            builder: DotSwiperPaginationBuilder(
+                              activeColor: gameData.gameType == GameType.play
+                                ? PLAY_HEADER_COLOR : gameData.gameType == GameType.ent
+                                ? EXERCISE_HEADER_COLOR : MAKE_HEADER_COLOR,
+                              color: Colors.white70,
+                            )
+                          ),
+                          itemBuilder: (context, index) {
+                            return Container(
+                              width: double.infinity,
+                              height: double.infinity,
+                              decoration: BoxDecoration(
+                                color: Colors.grey,
+                                border: Border.all(color: Colors.grey, width: 1),
+                                borderRadius: BorderRadius.circular(20)
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Expanded(
+                                    child: SizedBox.expand(
+                                      child: ClipRRect(
+                                        borderRadius: const BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20)),
+                                        child: Image.asset(gameData.detailImagePath[index],
+                                          fit: BoxFit.cover,
+                                        )
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }
                         ),
-                      )
+                      ),
+                    )
                   ),
                 ],
               ),
@@ -299,6 +341,7 @@ class _detailDescription extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           children: [
@@ -307,7 +350,7 @@ class _detailDescription extends StatelessWidget {
               height: 50,
             ),
             const SizedBox(width: 15),
-            Text("게임설명",
+            Text("게임 설명",
               style: TextStyle(
                 color: gameData.gameType == GameType.play
                   ? Y_TEXT_COLOR : gameData.gameType == GameType.ent
@@ -321,38 +364,26 @@ class _detailDescription extends StatelessWidget {
         const SizedBox(height: 10),
         Text(gameData.longDetail,
           style: TextStyle(
-              color: TEXT_COLOR,
-              fontWeight: FontWeight.bold
+            color: TEXT_COLOR,
+            fontWeight: FontWeight.bold,
+            fontSize: 16.5
           ),
-        )
-      ],
-    );
-  }
-}
+        ),
 
-class _detailPreview extends StatelessWidget {
-  final GameData gameData;
-  const _detailPreview({
-    super.key,
-    required this.gameData,
-  });
+        const SizedBox(height: 15),
 
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
         Row(
           children: [
-            Image.asset("assets/icon/search.png",
+            Image.asset("assets/icon/kitty2.png",
               width: 50,
               height: 50,
             ),
             const SizedBox(width: 15),
-            Text("미리보기",
+            Text("게임 방법",
               style: TextStyle(
                   color: gameData.gameType == GameType.play
-                    ? Y_TEXT_COLOR : gameData.gameType == GameType.ent
-                    ? EXERCISE_TEXT_COLOR : MAKE_TEXT_COLOR,
+                      ? Y_TEXT_COLOR : gameData.gameType == GameType.ent
+                      ? EXERCISE_TEXT_COLOR : MAKE_TEXT_COLOR,
                   fontSize: 25.0,
                   fontWeight: FontWeight.bold
               ),
@@ -360,30 +391,11 @@ class _detailPreview extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 10),
-        SizedBox(
-          height: 150,
-          child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              physics: const ClampingScrollPhysics(),
-              itemCount: 4,
-              separatorBuilder: (context, index) => const SizedBox(width: 10),
-              itemBuilder: (context, index) {
-                return Container(
-                  width: 110,
-                  decoration: BoxDecoration(
-                      color: gameData.gameType == GameType.play
-                        ? PLAY_CARD_COLOR : gameData.gameType == GameType.ent
-                        ? EXERCISE_CARD_COLOR : MAKE_CARD_COLOR,
-                      border: Border.all(
-                        color: gameData.gameType == GameType.play
-                          ? PLAY_STROKE_COLOR : gameData.gameType == GameType.ent
-                          ? EXERCISE_STROKE_COLOR : MAKE_STROKE_COLOR,
-                        width: 1
-                      ),
-                      borderRadius: BorderRadius.circular(20)
-                  ),
-                );
-              }
+        Text(gameData.howToPlay,
+          style: TextStyle(
+              color: TEXT_COLOR,
+              fontWeight: FontWeight.bold,
+              fontSize: 16.5
           ),
         )
       ],
