@@ -150,6 +150,7 @@ class _WordMatchingDetailState extends State<WordMatchingDetail> {
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: GridView.count(
+                    padding: EdgeInsets.zero,
                     crossAxisCount: 3,
                     mainAxisSpacing: 12,
                     crossAxisSpacing: 12,
@@ -228,14 +229,14 @@ class _MyPageHeader extends StatelessWidget {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Image.asset( img, width: 100, height: 100),
+                        Image.asset( img, width: 80, height: 80),
                         const SizedBox(height: 30),
                         Text(
                           '$label을(를) 찾아줄게!',
                           style: const TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
-                            fontSize: 25.0,
+                            fontSize: 20.0,
                           ),
                           textAlign: TextAlign.center,
                         ),

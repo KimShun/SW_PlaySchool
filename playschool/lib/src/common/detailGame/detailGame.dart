@@ -238,7 +238,7 @@ class _detailButtons extends StatelessWidget {
                 onPressed: () {
                   final Map<String, String> gameRouteMap = {
                     "그림 그리기": "/drawingGame",
-                    "단어 맞추기": "/word_matching",
+                    "단어그림맞추기": "/word_matching",
                     "틀린그림찾기": "",
                     "율동 따라하기": "/selectDance",
                     "동화책 만들기": "/makeFairyTaleBook",
