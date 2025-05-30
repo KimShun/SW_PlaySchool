@@ -341,7 +341,7 @@ class _gamePlayBtnState extends State<_gamePlayBtn> {
                 widget.gameData.name,
                 style: TextStyle(
                   color: TEXT_COLOR,
-                  fontSize: 14.0,
+                  fontSize: 12.0,
                   fontWeight: FontWeight.w600),
               )
             ],

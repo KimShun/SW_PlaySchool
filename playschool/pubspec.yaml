@@ -60,6 +60,10 @@ dependencies:
   pigeon: ^25.3.1
   device_info_plus: ^11.4.0
   flip_card: ^0.7.0
+  ffmpeg_kit_flutter_new:
+    git:
+      url: https://github.com/sk3llo/ffmpeg_kit_flutter.git
+      ref: android-local-aar
 
 dev_dependencies:
   flutter_test:
