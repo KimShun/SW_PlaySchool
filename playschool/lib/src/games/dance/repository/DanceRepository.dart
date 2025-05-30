@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:camera/camera.dart';
-// import 'package:ffmpeg_kit_flutter_new/ffmpeg_kit.dart';
+import 'package:ffmpeg_kit_flutter_new/ffmpeg_kit.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
@@ -28,7 +28,7 @@ class DanceRepository {
     final outputPath = '${directory.path}/rotated_output.mov';
 
     final command = '-i ${inputFile.path} -vf "transpose=2" -c:a copy $outputPath';
-    // await FFmpegKit.execute(command);
+    await FFmpegKit.execute(command);
 
     return XFile(outputPath);
   }
