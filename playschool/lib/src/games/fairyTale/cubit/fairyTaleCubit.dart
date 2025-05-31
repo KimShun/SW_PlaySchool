@@ -16,10 +16,24 @@ class FairyTaleCubit extends Cubit<FairyTaleState> {
 
     try {
       final fairyTaleResult = await fairyTaleRepository.createFairyBook(content, userUID, img);
+      print("non-error!!");
       emit(state.copyWith(fairyTaleResult: fairyTaleResult, fairyTaleStatus: FairyTaleStatus.complete));
     } catch(e) {
+      print("error!!");
+      print(e);
       emit(state.copyWith(fairyTaleStatus: FairyTaleStatus.error));
     }
+  }
+
+  Future<String> formatScene(String template, {
+    required String character,
+    required String background,
+    required String action,
+  }) async {
+    return template
+      .replaceAll("{character}", character)
+      .replaceAll("{background}", background)
+      .replaceAll("{action}", action);
   }
 }
 

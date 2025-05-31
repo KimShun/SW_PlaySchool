@@ -189,7 +189,7 @@ class _fairyListPart extends StatelessWidget {
                                 height: 70,
                               ),
                             ),
-                            Text(fairyTaleList[index].fiaryName,
+                            Text(fairyTaleList[index].fairyName,
                               style: TextStyle(
                                 color: MAKE_TEXT_COLOR,
                                 fontWeight: FontWeight.bold,

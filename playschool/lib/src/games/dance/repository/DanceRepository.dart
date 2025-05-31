@@ -25,7 +25,7 @@ class DanceRepository {
 
   Future<XFile> rotateVideo(XFile inputFile) async {
     final directory = await getTemporaryDirectory();
-    final outputPath = '${directory.path}/rotated_output.mov';
+    final outputPath = '${directory.path}/rotated_output.mp4';
 
     final command = '-i ${inputFile.path} -vf "transpose=2" -c:a copy $outputPath';
     await FFmpegKit.execute(command);
@@ -37,7 +37,7 @@ class DanceRepository {
     final uri = Uri.parse("$baseUrl/exercise/dance/assessment");
     // final uri = Uri.parse("http://10.20.106.244:8000/exercise/dance/assessment");
 
-    final originalFile = await copyAssetToFile(original, "original.mov");
+    final originalFile = await copyAssetToFile(original, "original.mp4");
     final rotatedRecordFile = await rotateVideo(record);
 
     final request = http.MultipartRequest("POST", uri)
