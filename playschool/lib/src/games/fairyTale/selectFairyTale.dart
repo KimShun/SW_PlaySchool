@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lottie/lottie.dart';
+import 'package:playschool/src/authentication/cubit/userCubit.dart';
 import 'package:playschool/src/games/fairyTale/cubit/fairyTaleCubit.dart';
 import 'package:playschool/src/games/fairyTale/repository/FairyTaleRepository.dart';
 import 'package:playschool/src/games/fairyTale/repository/fairyTaleList.dart';
@@ -75,6 +76,7 @@ class _SelectFairyTaleScreenState extends State<SelectFairyTaleScreen> {
       listenWhen: (previous, current) => previous.fairyTaleStatus != current.fairyTaleStatus,
       listener: (context, state) {
         if (state.fairyTaleStatus == FairyTaleStatus.complete) {
+          print("Checking!!");
           if (context.canPop()) { context.pop(); }
           context.read<AuthRepository>().userExpUp(context, context.read<AuthCubit>().state.token!);
           context.read<GameRepository>().updateGame(context, 5, context.read<AuthCubit>().state.token!);
@@ -415,7 +417,7 @@ class _makeFairyTaleBtns extends StatelessWidget {
                   onPressed: () {
                     if(selectedCharacter != null && selectedAction != null && selectedBackground != null) {
                       _showWaitingDialog(context);
-                      context.read<FairyTaleCubit>().createFairy(contentRead, context.read<AuthCubit>().state.token!);
+                      context.read<FairyTaleCubit>().createFairy(contentRead, context.read<UserCubit>().state!.userUID);
                     } else {
                       _showFailedDialog(context);
                     }

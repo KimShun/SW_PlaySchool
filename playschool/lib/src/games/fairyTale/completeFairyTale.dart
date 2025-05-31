@@ -2,6 +2,7 @@ import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_card_swiper/flutter_card_swiper.dart';
+import 'package:go_router/go_router.dart';
 import 'package:playschool/src/common/component/color.dart';
 import 'package:playschool/src/games/fairyTale/cubit/fairyTaleCubit.dart';
 
@@ -15,7 +16,7 @@ class CompleteFairyTaleScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    List<Map<String, String>> fairyResults = context.read<FairyTaleCubit>().state.fairyTaleResult!.fairyResults;
+    List<Map<String, dynamic>> fairyResults = context.read<FairyTaleCubit>().state.fairyTaleResult!.fairyResults;
 
     bool hasSafeArea(BuildContext context) {
       final padding = MediaQuery.of(context).padding;
@@ -132,7 +133,7 @@ class CompleteFairyTaleScreen extends StatelessWidget {
 }
 
 class _CompleteHeaderScreen extends StatelessWidget {
-  final List<Map<String, String>> fairyResults;
+  final List<Map<String, dynamic>> fairyResults;
 
   const _CompleteHeaderScreen({
     super.key,
@@ -144,115 +145,112 @@ class _CompleteHeaderScreen extends StatelessWidget {
     return SafeArea(
       top: true,
       bottom: false,
-      child: Stack(
-        children: [
-          Container(
-            height: 420,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(30),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 0.0,),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      child: Container(
+        height: 420,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(30),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 0.0,),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        context.go("/");
+                      },
+                      child: Image.asset("assets/icon/exit.png",
+                        width: 40,
+                        height: 40,
+                      ),
+                    ),
+                    Row(
                       children: [
                         GestureDetector(
-                          onTap: () {
-                            Navigator.of(context).pop();
-                          },
-                          child: Image.asset("assets/icon/exit.png",
+                          onTap: () {},
+                          child: Image.asset("assets/icon/shareIcon.png",
                             width: 40,
                             height: 40,
                           ),
                         ),
-                        Row(
-                          children: [
-                            GestureDetector(
-                              onTap: () {},
-                              child: Image.asset("assets/icon/shareIcon.png",
-                                width: 40,
-                                height: 40,
-                              ),
-                            ),
-                            const SizedBox(width: 10.0),
-                            GestureDetector(
-                              onTap: () {},
-                              child: Image.asset("assets/icon/downloadIcon.png",
-                                width: 40,
-                                height: 40,
-                              ),
-                            ),
-                          ],
+                        const SizedBox(width: 10.0),
+                        GestureDetector(
+                          onTap: () {},
+                          child: Image.asset("assets/icon/downloadIcon.png",
+                            width: 40,
+                            height: 40,
+                          ),
                         ),
                       ],
                     ),
-                  ),
-                  Flexible(
-                    child: CardSwiper(
-                        isLoop: true,
-                        backCardOffset: const Offset(30, 0),
-                        allowedSwipeDirection: const AllowedSwipeDirection.symmetric(horizontal: true, vertical: false),
-                        cardsCount: fairyResults.length,
-                        cardBuilder: (context, index, percentThresholdX, percentThresholdY) {
-                          return Container(
-                            decoration: BoxDecoration(
-                                color: MAKE_CARD_COLOR,
-                                border: Border.all(color: MAKE_STROKE_COLOR, width: 2),
-                                borderRadius: BorderRadius.circular(20)
+                  ],
+                ),
+              ),
+              Flexible(
+                child: CardSwiper(
+                    isLoop: true,
+                    backCardOffset: const Offset(30, 0),
+                    allowedSwipeDirection: const AllowedSwipeDirection.symmetric(horizontal: true, vertical: false),
+                    cardsCount: fairyResults.length,
+                    cardBuilder: (context, index, percentThresholdX, percentThresholdY) {
+                      return Container(
+                        decoration: BoxDecoration(
+                            color: MAKE_CARD_COLOR,
+                            border: Border.all(color: MAKE_STROKE_COLOR, width: 2),
+                            borderRadius: BorderRadius.circular(20)
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SizedBox(
+                              height: 220,
+                              child: ClipRRect(
+                                borderRadius: const BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20)),
+                                child: Image.network(
+                                  "http://192.168.219.105:8001/${fairyResults[index]["image"]!}",
+                                  fit: BoxFit.cover,
+                                  width: double.infinity
+                                ),
+                              ),
                             ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                SizedBox(
-                                  height: 220,
-                                  child: ClipRRect(
-                                    borderRadius: const BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20)),
-                                    child: Image.network(
-                                      fairyResults[index]["image"]!,
-                                      fit: BoxFit.cover
+                            const SizedBox(height: 10.0),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 8.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(fairyResults[index]["content"]!,
+                                    style: TextStyle(
+                                        color: MAKE_TEXT_COLOR,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 13.0
                                     ),
                                   ),
-                                ),
-                                const SizedBox(height: 10.0),
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 8.0),
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(fairyResults[index]["content"]!,
-                                        style: TextStyle(
-                                            color: MAKE_TEXT_COLOR,
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 18.0
-                                        ),
-                                      ),
-                                      const SizedBox(height: 3.0),
-                                      Text("${index+1} / ${fairyResults.length}",
-                                        style: TextStyle(
-                                            color: TEXT_COLOR,
-                                            fontWeight: FontWeight.normal,
-                                            fontSize: 14.0
-                                        ),
-                                      ),
-                                    ],
+                                  const SizedBox(height: 3.0),
+                                  Text("${index+1} / ${fairyResults.length}",
+                                    style: TextStyle(
+                                        color: TEXT_COLOR,
+                                        fontWeight: FontWeight.normal,
+                                        fontSize: 14.0
+                                    ),
                                   ),
-                                )
-                              ],
-                            ),
-                          );
-                        }
-                    ),
-                  ),
-                ],
+                                ],
+                              ),
+                            )
+                          ],
+                        ),
+                      );
+                    }
+                ),
               ),
-            ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

@@ -1,5 +1,5 @@
 class FairyTaleResult {
-  final List<Map<String, String>> fairyResults;
+  final List<Map<String, dynamic>> fairyResults;
 
   const FairyTaleResult({
     required this.fairyResults,
@@ -12,8 +12,8 @@ class FairyTaleResult {
   }
 }
 
-List<Map<String, String>> convertToList(List<String> imgs, List<String> contents) {
-  List<Map<String, String>> fairyResults = [];
+List<Map<String, dynamic>> convertToList(List<dynamic> imgs, List<dynamic> contents) {
+  List<Map<String, dynamic>> fairyResults = [];
   for (int i=0; i<imgs.length; i++) {
     fairyResults.add({
       "image": imgs[i],
