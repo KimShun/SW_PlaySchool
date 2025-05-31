@@ -21,6 +21,17 @@ class FairyTaleCubit extends Cubit<FairyTaleState> {
       emit(state.copyWith(fairyTaleStatus: FairyTaleStatus.error));
     }
   }
+
+  Future<String> formatScene(String template, {
+    required String character,
+    required String background,
+    required String action,
+  }) async {
+    return template
+      .replaceAll("{character}", character)
+      .replaceAll("{background}", background)
+      .replaceAll("{action}", action);
+  }
 }
 
 enum FairyTaleStatus {

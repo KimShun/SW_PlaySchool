@@ -3,28 +3,28 @@ import 'package:flutter/cupertino.dart';
 DanceInfo singFrog = DanceInfo(
   iconPath: "assets/dance/icon/frog.png",
   danceName: "개굴 개굴 개구리",
-  videoPath: "assets/dance/video/frogSong.mov",
+  videoPath: "assets/dance/video/frogSong.mp4",
   copyRight: "유튜브: 초코초코"
 );
 
 DanceInfo baduk = DanceInfo(
   iconPath: "assets/dance/icon/shiba.png",
   danceName: "바둑이 방울",
-  videoPath: "assets/dance/video/badukSong.mov",
+  videoPath: "assets/dance/video/badukSong.mp4",
   copyRight: "유튜브: 초코초코"
 );
 
 DanceInfo mountainRabbit = DanceInfo(
   iconPath: "assets/dance/icon/bunny.png",
   danceName: "산토끼 토끼야",
-  videoPath: "assets/dance/video/mountainRabbitSong.mov",
+  videoPath: "assets/dance/video/mountainRabbitSong.mp4",
   copyRight: "유튜브: 초코초코"
 );
 
 DanceInfo numberSong = DanceInfo(
   iconPath: "assets/dance/icon/numbers.png",
   danceName: "숫자송",
-  videoPath: "assets/dance/video/numberSong.mov",
+  videoPath: "assets/dance/video/numberSong.mp4",
   copyRight: "유튜브: 초코초코"
 );
 

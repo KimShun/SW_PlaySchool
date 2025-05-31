@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lottie/lottie.dart';
 import 'package:playschool/src/games/fairyTale/cubit/fairyTaleCubit.dart';
+import 'package:playschool/src/games/fairyTale/repository/FairyTaleRepository.dart';
 import 'package:playschool/src/games/fairyTale/repository/fairyTaleList.dart';
 
 import '../../authentication/cubit/authCubit.dart';
@@ -28,6 +29,28 @@ class _SelectFairyTaleScreenState extends State<SelectFairyTaleScreen> {
   SettingInfo? selectedCharacter;
   SettingInfo? selectedAction;
   SettingInfo? selectedBackground;
+  String? showContent;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _setShowContent();
+  }
+
+  void _setShowContent() async {
+    final formatted = showContent = await context.read<FairyTaleCubit>().formatScene(
+      widget.fairyTaleInfo.settingsFairyTale.scene,
+      character: selectedCharacter != null ? selectedCharacter!.name : "____",
+      background: selectedBackground != null ? selectedBackground!.name : "____",
+      action: selectedAction != null ? selectedAction!.name : "____"
+    );
+
+    // print(formatted);
+    setState(() {
+      showContent = formatted;
+    });
+  }
 
   void _resetSelections() {
     setState(() {
@@ -36,6 +59,7 @@ class _SelectFairyTaleScreenState extends State<SelectFairyTaleScreen> {
       selectedAction = null;
       selectedBackground = null;
     });
+    _setShowContent();
   }
 
   @override
@@ -77,7 +101,7 @@ class _SelectFairyTaleScreenState extends State<SelectFairyTaleScreen> {
                 scrollDirection: Axis.vertical,
                 child: Column(
                   children: [
-                    _detailHeader(fairyTaleInfo: widget.fairyTaleInfo),
+                    _detailHeader(fairyTaleInfo: widget.fairyTaleInfo, showContent: showContent ?? "로딩중...",),
                     const SizedBox(height: 15.0),
                     _selectFactorList(
                       iconPath: "assets/icon/character-design.png",
@@ -87,6 +111,7 @@ class _SelectFairyTaleScreenState extends State<SelectFairyTaleScreen> {
                         setState(() {
                           selectedCharacter = value;
                         });
+                        _setShowContent();
                       },
                       resetKey: _resetKey,
                     ),
@@ -99,6 +124,7 @@ class _SelectFairyTaleScreenState extends State<SelectFairyTaleScreen> {
                         setState(() {
                           selectedAction = value;
                         });
+                        _setShowContent();
                       },
                       resetKey: _resetKey,
                     ),
@@ -111,6 +137,7 @@ class _SelectFairyTaleScreenState extends State<SelectFairyTaleScreen> {
                         setState(() {
                           selectedBackground = value;
                         });
+                        _setShowContent();
                       },
                       resetKey: _resetKey,
                     ),
@@ -125,6 +152,7 @@ class _SelectFairyTaleScreenState extends State<SelectFairyTaleScreen> {
           selectedCharacter: selectedCharacter,
           selectedAction: selectedAction,
           selectedBackground: selectedBackground,
+          contentRead: showContent ?? "로딩중...",
           resetSelections: _resetSelections,
         ),
       ),
@@ -134,10 +162,12 @@ class _SelectFairyTaleScreenState extends State<SelectFairyTaleScreen> {
 
 class _detailHeader extends StatelessWidget {
   final FairyTaleInfo fairyTaleInfo;
+  final String showContent;
 
   const _detailHeader({
     super.key,
     required this.fairyTaleInfo,
+    required this.showContent,
   });
 
   @override
@@ -171,7 +201,7 @@ class _detailHeader extends StatelessWidget {
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(fairyTaleInfo.fiaryName,
+                                Text(fairyTaleInfo.fairyName,
                                   style: TextStyle(
                                     color: MAKE_TEXT_COLOR,
                                     fontWeight: FontWeight.bold,
@@ -199,7 +229,7 @@ class _detailHeader extends StatelessWidget {
                       child: SizedBox(
                         height: 110,
                         child: Center(
-                          child: Text(fairyTaleInfo.settingsFairyTale.scene,
+                          child: Text(showContent,
                             style: TextStyle(
                               fontSize: 13.0,
                               color: MAKE_TEXT_COLOR
@@ -334,11 +364,11 @@ class _selectFactorListState extends State<_selectFactorList> {
                           groupValue: _selectedIndex,
                           onChanged: (value) {
                             setState(() {
-                              _selectedIndex = value;
+                              _selectedIndex = _selectedIndex == value ? null : value;
                             });
 
-                            if(widget.onSelected != null) {
-                              widget.onSelected!(widget.factors[index]);
+                            if (_selectedIndex != null && widget.onSelected != null) {
+                              widget.onSelected!(widget.factors[_selectedIndex!]);
                             }
                           },
                           activeColor: MAKE_STROKE_COLOR,
@@ -359,6 +389,7 @@ class _makeFairyTaleBtns extends StatelessWidget {
   final SettingInfo? selectedCharacter;
   final SettingInfo? selectedAction;
   final SettingInfo? selectedBackground;
+  final String contentRead;
   final void Function() resetSelections;
 
   const _makeFairyTaleBtns({
@@ -366,6 +397,7 @@ class _makeFairyTaleBtns extends StatelessWidget {
     required this.selectedCharacter,
     required this.selectedAction,
     required this.selectedBackground,
+    required this.contentRead,
     required this.resetSelections,
   });
 
@@ -383,7 +415,7 @@ class _makeFairyTaleBtns extends StatelessWidget {
                   onPressed: () {
                     if(selectedCharacter != null && selectedAction != null && selectedBackground != null) {
                       _showWaitingDialog(context);
-                      context.read<FairyTaleCubit>().createFairy("", context.read<AuthCubit>().state.token!);
+                      context.read<FairyTaleCubit>().createFairy(contentRead, context.read<AuthCubit>().state.token!);
                     } else {
                       _showFailedDialog(context);
                     }
@@ -477,7 +509,7 @@ class _makeFairyTaleBtns extends StatelessWidget {
                     color: Y_TEXT_COLOR
                 ),
               ),
-              Text("조금만 기달려줘...",
+              Text("조금만 기다려줘...",
                 style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 17,
@@ -530,7 +562,7 @@ class _makeFairyTaleBtns extends StatelessWidget {
                     color: Y_TEXT_COLOR
                 ),
               ),
-              Text("항목을 전부 선택해줘야 해!",
+              Text("등장인물, 행동, 배경을 모두 선택해줘!",
                 style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 17,
