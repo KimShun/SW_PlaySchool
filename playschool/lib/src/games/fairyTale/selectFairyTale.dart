@@ -76,7 +76,6 @@ class _SelectFairyTaleScreenState extends State<SelectFairyTaleScreen> {
       listenWhen: (previous, current) => previous.fairyTaleStatus != current.fairyTaleStatus,
       listener: (context, state) {
         if (state.fairyTaleStatus == FairyTaleStatus.complete) {
-          print("Checking!!");
           if (context.canPop()) { context.pop(); }
           context.read<AuthRepository>().userExpUp(context, context.read<AuthCubit>().state.token!);
           context.read<GameRepository>().updateGame(context, 5, context.read<AuthCubit>().state.token!);

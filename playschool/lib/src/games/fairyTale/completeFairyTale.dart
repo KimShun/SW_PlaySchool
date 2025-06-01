@@ -55,7 +55,7 @@ class CompleteFairyTaleScreen extends StatelessWidget {
                         children: [
                           Column(
                             children: [
-                              Image.asset("assets/icon/fairyDragon.png",
+                              Image.asset(args["fairyTaleInfo"].iconPath,
                                 width: 70,
                                 height: 70,
                               ),
@@ -71,12 +71,12 @@ class CompleteFairyTaleScreen extends StatelessWidget {
                           ),
                           Column(
                             children: [
-                              Image.asset("assets/icon/kitty.png",
+                              Image.asset(args["selectedCharacter"].iconPath,
                                 width: 70,
                                 height: 70,
                               ),
                               const SizedBox(height: 5.0),
-                              Text("고양이",
+                              Text(args["selectedCharacter"].name,
                                 style: TextStyle(
                                     color: MAKE_TEXT_COLOR,
                                     fontWeight: FontWeight.bold,
@@ -87,12 +87,12 @@ class CompleteFairyTaleScreen extends StatelessWidget {
                           ),
                           Column(
                             children: [
-                              Image.asset("assets/icon/talking.png",
+                              Image.asset(args["selectedAction"].iconPath,
                                 width: 70,
                                 height: 70,
                               ),
                               const SizedBox(height: 5.0),
-                              Text("대화하기",
+                              Text(args["selectedAction"].name,
                                 style: TextStyle(
                                     color: MAKE_TEXT_COLOR,
                                     fontWeight: FontWeight.bold,
@@ -103,12 +103,12 @@ class CompleteFairyTaleScreen extends StatelessWidget {
                           ),
                           Column(
                             children: [
-                              Image.asset("assets/icon/trees.png",
+                              Image.asset(args["selectedBackground"].iconPath,
                                 width: 70,
                                 height: 70,
                               ),
                               const SizedBox(height: 5.0),
-                              Text("숲",
+                              Text(args["selectedBackground"].name,
                                 style: TextStyle(
                                   color: MAKE_TEXT_COLOR,
                                   fontWeight: FontWeight.bold,
