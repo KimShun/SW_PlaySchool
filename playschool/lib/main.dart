@@ -98,15 +98,15 @@ class _MyAppState extends State<MyApp> {
 }
 
 final GoRouter _router = GoRouter(
-  initialLocation: "/login",
-  redirect: (context, state) {
-    final authState = context.read<AuthCubit>().state;
-    if (authState.authStatus == AuthStatus.complete && state.topRoute!.path == "/login") {
-      return "/";
-    }
-
-    return null;
-  },
+  initialLocation: "/drawingGame",
+  // redirect: (context, state) {
+  //   final authState = context.read<AuthCubit>().state;
+  //   if (authState.authStatus == AuthStatus.complete && state.topRoute!.path == "/login") {
+  //     return "/";
+  //   }
+  //
+  //   return null;
+  // },
   routes: [
     GoRoute(
       path: "/",
