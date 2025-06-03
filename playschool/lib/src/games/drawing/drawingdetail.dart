@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:playschool/src/common/component/color.dart';
+import 'drawing_functions.dart';
 import 'package:playschool/src/games/drawing/drawing_functions.dart';
-
 
 class DrawingDetailScreen extends StatefulWidget {
   final String name;
   final String imagePath;
 
   const DrawingDetailScreen({
+
     super.key,
     required this.name,
     required this.imagePath,
@@ -18,21 +19,16 @@ class DrawingDetailScreen extends StatefulWidget {
   State<DrawingDetailScreen> createState() => _DrawingDetailScreenState();
 }
 
-class WordImagePair {
-  final String word;
-  final String imagePath;
-
-  WordImagePair({required this.word, required this.imagePath});
-}
-
-List<WordImagePair> items = [
-  WordImagePair(word: "다람쥐", imagePath: "assets/images/apple.png"),
-  WordImagePair(word: "banana", imagePath: "assets/images/banana.png"),
-];
-
 class _DrawingDetailScreenState extends State<DrawingDetailScreen> {
+  final GlobalKey<DrawingCanvasState> _canvasKey = GlobalKey();
+  double _strokeWidth = 8.0;
+
   @override
   Widget build(BuildContext context) {
+
+
+
+
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
 
@@ -55,7 +51,7 @@ class _DrawingDetailScreenState extends State<DrawingDetailScreen> {
                 height: screenHeight,
                 child: Stack(
                   children: [
-                    // 배경 이미지
+                    // 장식 이미지
                     Positioned(
                       top: screenHeight * 0.13,
                       left: screenWidth * 0.02,
@@ -93,14 +89,16 @@ class _DrawingDetailScreenState extends State<DrawingDetailScreen> {
                       ),
                     ),
 
-                    //  캔버스
+                    // 캔버스
                     Positioned(
                       top: screenHeight * 0.22,
                       left: screenWidth * 0.16,
                       child: SizedBox(
                         width: screenWidth * 0.65,
                         height: screenHeight * 0.37,
-                        child: const DrawingCanvas(),
+                        child: DrawingCanvas(
+                          key: _canvasKey,
+                        ),
                       ),
                     ),
 
@@ -123,7 +121,7 @@ class _DrawingDetailScreenState extends State<DrawingDetailScreen> {
                       ),
                     ),
 
-                    // 이름 텍스트
+                    // 단어 이름 텍스트
                     Align(
                       alignment: Alignment.topCenter,
                       child: Padding(
@@ -138,7 +136,7 @@ class _DrawingDetailScreenState extends State<DrawingDetailScreen> {
                       ),
                     ),
 
-                    // 상단 툴바 (뒤로가기 + undo + 저장 아이콘)
+                    // 상단 툴바
                     Column(
                       children: [
                         const SizedBox(height: 50),
@@ -148,7 +146,10 @@ class _DrawingDetailScreenState extends State<DrawingDetailScreen> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               GestureDetector(
-                                onTap: () => GoRouter.of(context).pop(),
+                                onTap: () {
+                                  _canvasKey.currentState?.clear();
+                                  GoRouter.of(context).pop();
+                                },
                                 child: Image.asset(
                                   "assets/icon/exit.png",
                                   width: 50,
@@ -159,10 +160,14 @@ class _DrawingDetailScreenState extends State<DrawingDetailScreen> {
                                 children: [
                                   GestureDetector(
                                     onTap: () {
-                                      DrawingFunctions.clear();
+                                      _canvasKey.currentState?.clear();
                                       setState(() {});
                                     },
-                                    child: Image.asset("assets/icon/undo.png", width: 50, height: 50),
+                                    child: Image.asset(
+                                      "assets/icon/undo.png",
+                                      width: 50,
+                                      height: 50,
+                                    ),
                                   ),
                                   const SizedBox(width: 15),
                                   Image.asset("assets/icon/download.png", width: 50, height: 50),
@@ -175,6 +180,7 @@ class _DrawingDetailScreenState extends State<DrawingDetailScreen> {
                       ],
                     ),
 
+                    // 하단 툴바
                     Align(
                       alignment: Alignment.bottomCenter,
                       child: Padding(
@@ -183,20 +189,26 @@ class _DrawingDetailScreenState extends State<DrawingDetailScreen> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             BrushSizeSlider(
-                              onValueChanged: () => setState(() {}),
+                              strokeWidth: _strokeWidth,
+                              onValueChanged: (val) {
+                                setState(() {
+                                  _strokeWidth = val;
+                                  _canvasKey.currentState?.setStrokeWidth(val);
+
+                                });
+                              },
                             ),
                             const SizedBox(height: 20),
                             DrawingToolBar(
-                              setStateCallback: () => setState(() {}),
-
+                              canvasKey: _canvasKey,
+                              onErase: () => _canvasKey.currentState?.erase(),
+                              onChangeColor: (color) => _canvasKey.currentState?.changeColor(color),
+                              imagePath: widget.imagePath,
                             ),
                           ],
                         ),
                       ),
                     ),
-
-
-
                   ],
                 ),
               ),
@@ -207,4 +219,3 @@ class _DrawingDetailScreenState extends State<DrawingDetailScreen> {
     );
   }
 }
-
