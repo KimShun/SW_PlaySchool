@@ -21,6 +21,7 @@ import 'package:playschool/src/games/dance/repository/danceList.dart';
 import 'package:playschool/src/games/dance/selectDance.dart';
 import 'package:playschool/src/games/drawing/drawingGame.dart';
 import 'package:playschool/src/games/drawing/drawingdetail.dart';
+import 'package:playschool/src/games/drawing/drawingResult.dart';
 import 'package:playschool/src/games/fairyTale/completeFairyTale.dart';
 import 'package:playschool/src/games/fairyTale/cubit/fairyTaleCubit.dart';
 import 'package:playschool/src/games/fairyTale/repository/FairyTaleRepository.dart';
@@ -152,6 +153,20 @@ final GoRouter _router = GoRouter(
       },
     ),
     GoRoute(
+      path: '/drawingResult',
+      builder: (context, state) {
+        final extra = state.extra as Map?;
+        return DrawingResult(
+          similarityPercent: extra?['similarityPercent'] ?? 0.0,
+          userDrawingPath: extra?['userDrawingPath'] ?? '',
+          canvasWidth: extra?['canvasWidth'] ?? 0,
+          canvasHeight: extra?['canvasHeight'] ?? 0,
+        );
+      },
+    ),
+
+
+    GoRoute(
       path: "/makeFairyTaleBook",
       builder: (context, state) {
         final gameData = state.extra as GameData?;
@@ -206,5 +221,7 @@ final GoRouter _router = GoRouter(
         return WordMatchingDetail(label: label, img: img);
       },
     ),
+
+
   ]
 );

@@ -9,7 +9,9 @@ import 'dart:typed_data';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
 import 'package:flutter/services.dart';
-
+import 'package:go_router/go_router.dart';
+import 'package:playschool/src/common/component/color.dart';
+import 'package:lottie/lottie.dart';
 
 class Stroke {
   final List<Offset> points;
@@ -62,7 +64,6 @@ class _DrawingPainter extends CustomPainter {
 class DrawingCanvas extends StatefulWidget {
   const DrawingCanvas({super.key});
 
-
   @override
   State<DrawingCanvas> createState() => DrawingCanvasState();
 }
@@ -73,16 +74,14 @@ class DrawingCanvasState extends State<DrawingCanvas> {
   final GlobalKey _repaintKey = GlobalKey();
 
   Color selectedColor = Colors.black;
-  double brushWidth = 8.0;     // 선의 굵기
-  double eraserWidth = 25.0;   // 지우개의 반지름
+  double brushWidth = 8.0;
+  double eraserWidth = 25.0;
+
   double get strokeWidth => isErasing ? eraserWidth : brushWidth;
+
   void setStrokeWidth(double val) {
     setState(() {
-      if (isErasing) {
-        eraserWidth = val;
-      } else {
-        brushWidth = val;
-      }
+      isErasing ? eraserWidth = val : brushWidth = val;
     });
   }
 
@@ -98,27 +97,16 @@ class DrawingCanvasState extends State<DrawingCanvas> {
   void addPoint(Offset point) {
     if (isErasing) {
       setState(() {
-        strokes.add(
-          Stroke(
-            points: [point, point], // 짧은 선
-            color: Colors.transparent,
-            width: eraserWidth,
-          ),
-        );
+        strokes.add(Stroke(points: [point, point], color: Colors.transparent, width: eraserWidth));
       });
     } else {
       currentPoints.add(point);
     }
   }
 
-
   void endStroke() {
     if (currentPoints.isNotEmpty) {
-      strokes.add(Stroke(
-        points: List.from(currentPoints),
-        color: selectedColor,
-        width: strokeWidth,
-      ));
+      strokes.add(Stroke(points: List.from(currentPoints), color: selectedColor, width: strokeWidth));
       currentPoints.clear();
     }
   }
@@ -141,6 +129,7 @@ class DrawingCanvasState extends State<DrawingCanvas> {
     setState(() {
       strokes.clear();
       currentPoints.clear();
+      debugPrint("✅ Canvas cleared!");
     });
   }
 
@@ -149,16 +138,13 @@ class DrawingCanvasState extends State<DrawingCanvas> {
     return LayoutBuilder(
       builder: (context, constraints) {
         final canvasSize = constraints.biggest;
-
         return MouseRegion(
           cursor: isErasing ? SystemMouseCursors.precise : SystemMouseCursors.basic,
           child: Stack(
             children: [
               Listener(
                 onPointerHover: (event) {
-                  if (isErasing) {
-                    setState(() => _cursorPosition = event.localPosition);
-                  }
+                  if (isErasing) setState(() => _cursorPosition = event.localPosition);
                 },
                 onPointerDown: (event) {
                   setState(() {
@@ -185,17 +171,8 @@ class DrawingCanvasState extends State<DrawingCanvas> {
                 child: RepaintBoundary(
                   key: _repaintKey,
                   child: CustomPaint(
-                    painter: _DrawingPainter(
-                      strokes,
-                      currentPoints,
-                      selectedColor,
-                      isErasing ? eraserWidth : brushWidth,
-                    ),
-                    child: Container(
-                      width: double.infinity,
-                      height: double.infinity,
-                      color: Colors.transparent,
-                    ),
+                    painter: _DrawingPainter(strokes, currentPoints, selectedColor, strokeWidth),
+                    child: Container(width: double.infinity, height: double.infinity, color: Colors.transparent),
                   ),
                 ),
               ),
@@ -230,11 +207,7 @@ class BrushSizeSlider extends StatefulWidget {
   final double strokeWidth;
   final ValueChanged<double> onValueChanged;
 
-  const BrushSizeSlider({
-    super.key,
-    required this.strokeWidth,
-    required this.onValueChanged,
-  });
+  const BrushSizeSlider({super.key, required this.strokeWidth, required this.onValueChanged});
 
   @override
   State<BrushSizeSlider> createState() => _BrushSizeSliderState();
@@ -245,6 +218,7 @@ class _BrushSizeSliderState extends State<BrushSizeSlider> {
 
   @override
   void initState() {
+
     super.initState();
     _currentSliderValue = widget.strokeWidth;
   }
@@ -279,7 +253,6 @@ class DrawingToolBar extends StatelessWidget {
   final ValueChanged<Color> onChangeColor;
   final String imagePath;
   final GlobalKey<DrawingCanvasState> canvasKey;
-
 
   const DrawingToolBar({
     super.key,
@@ -340,47 +313,75 @@ class DrawingToolBar extends StatelessWidget {
         ),
         GestureDetector(
           onTap: () async {
-            print("버튼 눌림!");
-
-            DrawingCanvasState? canvasState = canvasKey.currentState;
-            if (canvasState == null) {
-              print("canvasState가 null임");
-              return;
-            }
-
-            int retry = 0;
-            while (canvasState == null && retry < 5) {
-              await Future.delayed(const Duration(milliseconds: 100));
-              canvasState = canvasKey.currentState;
-              retry++;
-            }
+            final canvasState = canvasKey.currentState;
+            if (canvasState == null) return;
 
             final referenceImage = await loadUiImage(imagePath);
-            print("✅ reference image loaded");
+            final userImage = await canvasState.captureCanvasImage();
 
-            final userImage = await canvasState!.captureCanvasImage();
-            print("✅ user image captured");
+            final paintedReference = await flattenToWhiteBackground(referenceImage);
+            final paintedUser = await flattenToWhiteBackground(userImage);
 
-            final similarity = await compareWithOpenCV(referenceImage, userImage);
-            print("✅ similarity: $similarity");
+            final tempDir = await getTemporaryDirectory();
+            final timestamp = DateTime.now().millisecondsSinceEpoch;
 
-            showDialog(
-              context: context,
-              builder: (_) => AlertDialog(
-                title: const Text("유사도 결과"),
-                content: Text("유사도: ${(similarity * 100).toStringAsFixed(2)}%"),
-              ),
+            final referencePath = "${tempDir.path}/ref_flattened_$timestamp.png";
+            final userPath = "${tempDir.path}/user_flattened_$timestamp.png";
+
+            await saveUiImageToFile(paintedReference, referencePath);
+            await saveUiImageToFile(paintedUser, userPath);
+
+            final similarityPercent = await compareWithMatchShapes(referencePath, userPath);
+
+            final canvasWidth = userImage.width;
+            final canvasHeight = userImage.height;
+
+            showLoadingDialog(context);
+            await Future.delayed(const Duration(seconds: 2));
+            Navigator.of(context).pop(); // 로딩 다이얼로그 닫기
+
+
+
+            context.push(
+              '/drawingResult',
+              extra: {
+                'similarityPercent': similarityPercent,
+                'userDrawingPath': userPath,
+                'canvasWidth': canvasWidth,
+                'canvasHeight': canvasHeight,
+              },
             );
+
+            canvasKey.currentState?.clear();
+
           },
           child: Image.asset("assets/icon/exhibition.png", width: 85, height: 85),
         ),
-
-
       ],
     );
   }
 }
 
+Future<ui.Image> flattenToWhiteBackground(ui.Image original) async {
+  final recorder = ui.PictureRecorder();
+  final canvas = Canvas(recorder);
+
+  canvas.drawRect(
+    Rect.fromLTWH(0, 0, original.width.toDouble(), original.height.toDouble()),
+    Paint()..color = Colors.white,
+  );
+  canvas.drawImage(original, Offset.zero, Paint());
+
+  final picture = recorder.endRecording();
+  return await picture.toImage(original.width, original.height);
+}
+
+Future<void> saveUiImageToFile(ui.Image image, String path) async {
+  final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+  final buffer = byteData!.buffer.asUint8List();
+  final file = File(path);
+  await file.writeAsBytes(buffer);
+}
 
 Future<ui.Image> loadUiImage(String assetPath) async {
   final byteData = await rootBundle.load(assetPath);
@@ -389,47 +390,68 @@ Future<ui.Image> loadUiImage(String assetPath) async {
   return frame.image;
 }
 
-Future<double> compareWithOpenCV(ui.Image referenceImage, ui.Image userImage) async {
-  Future<Uint8List> imageToBytes(ui.Image image) async {
-    final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
-    return byteData!.buffer.asUint8List();
-  }
+Future<double> compareWithMatchShapes(String imgPath1, String imgPath2) async {
+  final img1 = cv.imread(imgPath1, flags: cv.IMREAD_GRAYSCALE);
+  final img2 = cv.imread(imgPath2, flags: cv.IMREAD_GRAYSCALE);
 
-  Future<String> saveTemp(Uint8List bytes, String filename) async {
-    final dir = await getTemporaryDirectory();
-    final path = '${dir.path}/$filename.png';
-    final file = File(path);
-    await file.writeAsBytes(bytes);
-    return path;
-  }
+  final (_, thresh1) = cv.threshold(img1, 127, 255, cv.THRESH_BINARY_INV);
+  final (_, thresh2) = cv.threshold(img2, 127, 255, cv.THRESH_BINARY_INV);
 
-  // 1. 이미지 → 바이트 → 파일로 저장
-  final refBytes = await imageToBytes(referenceImage);
-  final userBytes = await imageToBytes(userImage);
-  final refPath = await saveTemp(refBytes, 'reference');
-  final userPath = await saveTemp(userBytes, 'user');
+  final (contours1, _) = cv.findContours(thresh1, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE);
+  final (contours2, _) = cv.findContours(thresh2, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE);
 
-  // 2. 이미지 로드 (컬러로)
-  final refMat = cv.imread(refPath, flags: cv.IMREAD_COLOR);
-  final userMat = cv.imread(userPath, flags: cv.IMREAD_COLOR);
+  if (contours1.isEmpty || contours2.isEmpty) return 0.0;
 
-  // 3. 그레이스케일 변환
-  final refGray = cv.cvtColor(refMat, cv.COLOR_BGR2GRAY);
-  final userGray = cv.cvtColor(userMat, cv.COLOR_BGR2GRAY);
+  final cnt1 = contours1.reduce((a, b) => cv.contourArea(a) > cv.contourArea(b) ? a : b);
+  final cnt2 = contours2.reduce((a, b) => cv.contourArea(a) > cv.contourArea(b) ? a : b);
 
-  // 4. Canny 엣지 감지
-  final refEdge = cv.canny(refGray, 50, 150);
-  final userEdge = cv.canny(userGray, 50, 150);
+  final rawScore = cv.matchShapes(cnt1, cnt2, cv.CONTOURS_MATCH_I1, 0.0);
+  const maxThreshold = 0.3;
+  final similarityPercent = (1.0 - (rawScore / maxThreshold).clamp(0.0, 1.0)) * 100;
 
-  // 5. 사용자 이미지 크기 맞추기
-  final resizedUser = cv.resize(userEdge, (refEdge.size[0], refEdge.size[1]));
-
-  // 6. 차이 계산 후 norm 비교 (L2 거리 → 유사도 계산)
-  final diffMat = cv.subtract(refEdge, resizedUser);
-  final diff = cv.norm(diffMat, normType: cv.NORM_L2);
-  final max = refEdge.size[0] * refEdge.size[1] * 255;
-  final similarity = (1.0 - (diff / max)).clamp(0.0, 1.0);
-
-  return similarity;
+  return similarityPercent;
 }
 
+void showLoadingDialog(BuildContext context) {
+  showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (_) {
+      return AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        backgroundColor: BG_COLOR, // 예쁜 배경색 (기존 스타일 유지)
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Lottie.asset(
+              "assets/lottie/loading.json",
+              width: 120,
+              height: 120,
+              repeat: true,
+            ),
+            const SizedBox(height: 20),
+            Text(
+              "✨ 감정 중이에요... ✨",
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Y_TEXT_COLOR,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              "내 그림을 감정받고 있어요!\n잠깐만 기다려줘요 💫",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 15,
+                color: Y_TEXT_COLOR,
+              ),
+            ),
+          ],
+        ),
+      );
+    },
+  );
+}

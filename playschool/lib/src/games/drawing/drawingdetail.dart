@@ -23,11 +23,18 @@ class _DrawingDetailScreenState extends State<DrawingDetailScreen> {
   final GlobalKey<DrawingCanvasState> _canvasKey = GlobalKey();
   double _strokeWidth = 8.0;
 
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _canvasKey.currentState?.clear(); //
+    });
+  }
+
+
   @override
   Widget build(BuildContext context) {
-
-
-
 
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
@@ -156,23 +163,22 @@ class _DrawingDetailScreenState extends State<DrawingDetailScreen> {
                                   height: 50,
                                 ),
                               ),
-                              Row(
-                                children: [
-                                  GestureDetector(
-                                    onTap: () {
-                                      _canvasKey.currentState?.clear();
-                                      setState(() {});
-                                    },
-                                    child: Image.asset(
-                                      "assets/icon/undo.png",
-                                      width: 50,
-                                      height: 50,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 15),
-                                  Image.asset("assets/icon/download.png", width: 50, height: 50),
-                                ],
+                              const Spacer(),
+
+                              GestureDetector(
+                                onTap: () {
+                                  _canvasKey.currentState?.clear();
+                                  setState(() {});
+                                },
+                                child: Image.asset(
+                                  "assets/icon/undo.png",
+                                  width: 50,
+                                  height: 50,
+                                ),
                               ),
+
+
+
                             ],
                           ),
                         ),
