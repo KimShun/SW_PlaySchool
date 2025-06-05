@@ -43,8 +43,51 @@ String _getMessageBySimilarity(double percent) {
 }
 
 
+Widget buildStarIcons(int count) {
+  List<Widget> stars = [];
+
+  for (int i = 0; i < 3; i++) {
+    final isRotatedLeft = i == 0;
+    final isRotatedRight = i == 2;
+
+    final isFilled = i < count;
+
+    stars.add(
+      Padding(
+        padding: EdgeInsets.only(top: (isRotatedLeft || isRotatedRight) ? 20.0 : 0),
+        child: Transform.rotate(
+          angle: isRotatedLeft
+              ? 270 * 3.1415927 / 180
+              : isRotatedRight
+              ? 90 * 3.1415927 / 180
+              : 0,
+          child: Image.asset(
+            isFilled
+                ? "assets/icon/favourite (1).png"
+                : "assets/icon/favourite.png",
+            width: 65,
+            height: 65,
+          ),
+        ),
+      ),
+    );
+
+    if (i < 2) stars.add(const SizedBox(width: 20.0));
+  }
+
+  return Row(
+    mainAxisAlignment: MainAxisAlignment.center,
+    children: stars,
+  );
+}
 
 
+int _getStarCount(double percent) {
+  if (percent == 0) return 0;
+  if (percent >= 80.0) return 3;
+  if (percent >= 40.0) return 2;
+  return 1;
+}
 
 
 class _CommonResultView extends StatelessWidget {
@@ -59,6 +102,8 @@ class _CommonResultView extends StatelessWidget {
     required this.canvasWidth,
     required this.canvasHeight,
   });
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -86,17 +131,21 @@ class _CommonResultView extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                const SizedBox(height: 110),
+                const SizedBox(height: 70),
 
-                Text(
-                  "그림의 점수는 ${similarityPercent.toStringAsFixed(0)}점",
-                  style: const TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+                buildStarIcons(_getStarCount(similarityPercent)),
+                const SizedBox(height: 10),
 
-                const SizedBox(height: 15),
+
+                // Text(
+                //   "그림의 점수는 ${similarityPercent.toStringAsFixed(0)}점",
+                //   style: const TextStyle(
+                //     fontSize: 28,
+                //     fontWeight: FontWeight.bold,
+                //   ),
+                // ),
+
+                const SizedBox(height: 10),
 
                 Stack(
                   alignment: Alignment.center,
@@ -109,7 +158,7 @@ class _CommonResultView extends StatelessWidget {
                         child: SizedBox(
                           width: 100,
                           height: 100,
-                          child: CircularProgressIndicator(), // 또는 아무것도 안 보이게 하고 싶다면 SizedBox.shrink()
+                          child: CircularProgressIndicator(), //
                         ),
                       )
                     else
@@ -124,14 +173,36 @@ class _CommonResultView extends StatelessWidget {
                         ),
                       ),
 
+                    Positioned(
+                      bottom: 30,
+                      child: Text(
+                        "${similarityPercent.toStringAsFixed(0)}점",
+                        style: const TextStyle(
+                          fontSize: 25,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black87,
+                          shadows: [
+                            Shadow(
+                              color: Colors.red,
+                              blurRadius: 4,
+                              offset: Offset(1, 1),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+
+
                   ],
+
+
                 ),
 
                 const SizedBox(height: 30),
                 Text(
                   _getMessageBySimilarity(similarityPercent),
                   style: const TextStyle(
-                    fontSize: 22,
+                    fontSize: 20,
                     fontWeight: FontWeight.bold,
                     color: Colors.black87,
                   ),
@@ -143,7 +214,7 @@ class _CommonResultView extends StatelessWidget {
           ),
         ),
 
-        // 🎇 파이어워크 (하이 유사도에만 표시)
+        // (하이 유사도에만 표시)
         if (similarityPercent >= 80.0)
           Positioned(
             top: 100,
@@ -170,7 +241,7 @@ class _CommonResultView extends StatelessWidget {
                   children: [
                     Lottie.asset("assets/lottie/draw.json", width: 100),
                     const SizedBox(height: 8),
-                    const Text("도전!", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    const Text("도전!", style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
                   ],
                 ),
               ),
@@ -180,7 +251,7 @@ class _CommonResultView extends StatelessWidget {
                   children: [
                     Lottie.asset("assets/lottie/leave.json", width: 100),
                     const SizedBox(height: 8),
-                    const Text("아니야 떠날래~", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold), ),
+                    const Text("아니야 떠날래~", style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold), ),
                   ],
                 ),
               ),
