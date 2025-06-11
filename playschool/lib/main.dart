@@ -1,6 +1,9 @@
 import 'dart:io';
 
+import 'package:device_info_plus/device_info_plus.dart';
+import 'package:ffmpeg_kit_flutter_new/ffmpeg_kit.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
@@ -21,13 +24,13 @@ import 'package:playschool/src/games/dance/repository/danceList.dart';
 import 'package:playschool/src/games/dance/selectDance.dart';
 import 'package:playschool/src/games/drawing/drawingGame.dart';
 import 'package:playschool/src/games/drawing/drawingdetail.dart';
-import 'package:playschool/src/games/drawing/drawingResult.dart';
 import 'package:playschool/src/games/fairyTale/completeFairyTale.dart';
 import 'package:playschool/src/games/fairyTale/cubit/fairyTaleCubit.dart';
 import 'package:playschool/src/games/fairyTale/repository/FairyTaleRepository.dart';
 import 'package:playschool/src/games/fairyTale/repository/fairyTaleList.dart';
 import 'package:playschool/src/games/fairyTale/makeFairyTale.dart';
 import 'package:playschool/src/games/fairyTale/selectFairyTale.dart';
+import 'package:playschool/src/games/findWrong/findWrongScreen.dart';
 import 'package:playschool/src/games/repository/GameRepository.dart';
 import 'package:playschool/src/games/today/puzzleGame/cubit/puzzleCubit.dart';
 import 'package:playschool/src/games/today/puzzleGame/puzzle.dart';
@@ -99,15 +102,15 @@ class _MyAppState extends State<MyApp> {
 }
 
 final GoRouter _router = GoRouter(
-  initialLocation: "/drawingGame",
-  // redirect: (context, state) {
-  //   final authState = context.read<AuthCubit>().state;
-  //   if (authState.authStatus == AuthStatus.complete && state.topRoute!.path == "/login") {
-  //     return "/";
-  //   }
-  //
-  //   return null;
-  // },
+  initialLocation: "/login",
+  redirect: (context, state) {
+    final authState = context.read<AuthCubit>().state;
+    if (authState.authStatus == AuthStatus.complete && state.topRoute!.path == "/login") {
+      return "/";
+    }
+
+    return null;
+  },
   routes: [
     GoRoute(
       path: "/",
@@ -152,20 +155,6 @@ final GoRouter _router = GoRouter(
         return DrawingDetailScreen(name: name, imagePath: imagePath);
       },
     ),
-    GoRoute(
-      path: '/drawingResult',
-      builder: (context, state) {
-        final extra = state.extra as Map?;
-        return DrawingResult(
-          similarityPercent: extra?['similarityPercent'] ?? 0.0,
-          userDrawingPath: extra?['userDrawingPath'] ?? '',
-          canvasWidth: extra?['canvasWidth'] ?? 0,
-          canvasHeight: extra?['canvasHeight'] ?? 0,
-        );
-      },
-    ),
-
-
     GoRoute(
       path: "/makeFairyTaleBook",
       builder: (context, state) {
@@ -217,11 +206,12 @@ final GoRouter _router = GoRouter(
       path: '/word_matching_detail',
       builder: (context, state) {
         final label = (state.extra as Map?)?['label'] ?? '';
-        final img = (state.extra as Map?)?['img'] ?? '';
-        return WordMatchingDetail(label: label, img: img);
+        return WordMatchingDetail(label: label);
       },
     ),
-
-
+    GoRoute(
+      path: "/findWrongPlay",
+      builder: (context, state) => const FindWrongGameScreen(),
+    )
   ]
 );
