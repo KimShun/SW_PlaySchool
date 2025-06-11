@@ -38,6 +38,14 @@ class _FindWrongGameScreenState extends State<FindWrongGameScreen> {
     });
   }
 
+  // 좌표 스케일링 함수 (핵심 추가)
+  Offset scaleOffsetForFill(
+      Offset originalOffset, Size originalSize, Size displayedSize) {
+    double scaleX = displayedSize.width / originalSize.width;
+    double scaleY = displayedSize.height / originalSize.height;
+    return Offset(originalOffset.dx * scaleX, originalOffset.dy * scaleY);
+  }
+
   void showDifficultyDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -160,7 +168,7 @@ class _FindWrongGameScreenState extends State<FindWrongGameScreen> {
     });
   }
 
-  void _handleTap(TapDownDetails details) {
+  void _handleTap(TapDownDetails details, Size displayedSize) {
     if (!_gameStarted || _currentImageData == null) return;
 
     final localPosition = details.localPosition;
@@ -169,7 +177,10 @@ class _FindWrongGameScreenState extends State<FindWrongGameScreen> {
     _showBackButtonTemporarily();
 
     for (final spot in _currentImageData!.differences) {
-      if ((localPosition - spot).distance < 50 && !_foundSpots.contains(spot)) {
+      final scaledSpot = scaleOffsetForFill(
+          spot, _currentImageData!.originalSize, displayedSize);
+      if ((localPosition - scaledSpot).distance < 50 &&
+          !_foundSpots.contains(spot)) {
         setState(() {
           _foundSpots.add(spot);
           _score++;
@@ -282,14 +293,16 @@ class _FindWrongGameScreenState extends State<FindWrongGameScreen> {
   }
 
   Widget _buildImage(String imagePath, BoxFit fitMode, {bool showBackButton = false}) {
-    return GestureDetector(
-      onTapDown: (details) {
-        _showBackButtonTemporarily();
-        _handleTap(details);
-      },
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          return Stack(
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final displayedSize = Size(constraints.maxWidth, constraints.maxHeight);
+
+        return GestureDetector(
+          onTapDown: (details) {
+            _showBackButtonTemporarily();
+            _handleTap(details, displayedSize);
+          },
+          child: Stack(
             children: [
               Image.asset(
                 imagePath,
@@ -297,18 +310,22 @@ class _FindWrongGameScreenState extends State<FindWrongGameScreen> {
                 height: double.infinity,
                 fit: fitMode,
               ),
-              ..._foundSpots.map((offset) => Positioned(
-                left: offset.dx - 25,
-                top: offset.dy - 25,
-                child: Container(
-                  width: 50,
-                  height: 50,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(color: Colors.red, width: 6),
+              ..._foundSpots.map((originalSpot) {
+                final scaledSpot = scaleOffsetForFill(
+                    originalSpot, _currentImageData!.originalSize, displayedSize);
+                return Positioned(
+                  left: scaledSpot.dx - 25,
+                  top: scaledSpot.dy - 25,
+                  child: Container(
+                    width: 50,
+                    height: 50,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.red, width: 6),
+                    ),
                   ),
-                ),
-              )),
+                );
+              }),
               ..._wrongSpots.map((wrong) => Positioned(
                 left: wrong.position.dx - 15,
                 top: wrong.position.dy - 15,
@@ -331,9 +348,9 @@ class _FindWrongGameScreenState extends State<FindWrongGameScreen> {
                   ),
                 ),
             ],
-          );
-        },
-      ),
+          ),
+        );
+      },
     );
   }
 
@@ -351,7 +368,7 @@ class _FindWrongGameScreenState extends State<FindWrongGameScreen> {
             Expanded(
               child: _buildImage(
                 _currentImageData!.topImagePath,
-                BoxFit.cover,
+                BoxFit.fill,
                 showBackButton: true,
               ),
             ),
@@ -379,7 +396,7 @@ class _FindWrongGameScreenState extends State<FindWrongGameScreen> {
             Expanded(
               child: _buildImage(
                 _currentImageData!.bottomImagePath,
-                BoxFit.cover,
+                BoxFit.fill,
                 showBackButton: false,
               ),
             ),

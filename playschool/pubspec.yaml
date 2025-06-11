@@ -94,6 +94,11 @@ flutter:
     - assets/findWrong/hard/
     - assets/dance/icon/
     - assets/dance/video/
+    - assets/detail/dance/
+    - assets/detail/fairytale/
+    - assets/detail/findwrong/
+    - assets/detail/paint/
+    - assets/detail/wordgame/
     - assets/icon/
     - assets/background/
     - assets/lottie/

@@ -1,8 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:playschool/src/games/findWrong/model/findWrong.dart'; // 모델 파일 import
+import 'package:playschool/src/games/findWrong/model/findWrong.dart';
+
+Offset scaleOffsetForFill(Offset originalOffset, Size originalSize, Size displayedSize) {
+  double scaleX = displayedSize.width / originalSize.width;
+  double scaleY = displayedSize.height / originalSize.height;
+
+  return Offset(originalOffset.dx * scaleX, originalOffset.dy * scaleY);
+}
 
 
-// 난이도 쉬움 이미지 4장
+// 난이도 쉬움 이미지 5장
 final List<FindWrongImageData> easyImages = [
   FindWrongImageData(
     topImagePath: 'assets/findWrong/easy/top01.jpg',
@@ -12,6 +19,7 @@ final List<FindWrongImageData> easyImages = [
       Offset(220, 275),
       Offset(340, 95),
     ],
+    originalSize: Size(393, 393), // 예시: 원본 이미지 사이즈 입력
   ),
   FindWrongImageData(
     topImagePath: 'assets/findWrong/easy/top02.jpg',
@@ -21,6 +29,7 @@ final List<FindWrongImageData> easyImages = [
       Offset(185, 185),
       Offset(85, 392),
     ],
+    originalSize: Size(400, 400),
   ),
   FindWrongImageData(
     topImagePath: 'assets/findWrong/easy/top03.jpg',
@@ -30,6 +39,7 @@ final List<FindWrongImageData> easyImages = [
       Offset(35, 95),
       Offset(370, 33),
     ],
+    originalSize: Size(393, 393),
   ),
   FindWrongImageData(
     topImagePath: 'assets/findWrong/easy/top04.jpg',
@@ -39,6 +49,7 @@ final List<FindWrongImageData> easyImages = [
       Offset(57, 370),
       Offset(372, 270),
     ],
+    originalSize: Size(393, 393),
   ),
   FindWrongImageData(
     topImagePath: 'assets/findWrong/easy/top05.png',
@@ -48,11 +59,11 @@ final List<FindWrongImageData> easyImages = [
       Offset(340, 295),
       Offset(330, 50),
     ],
+    originalSize: Size(393, 393),
   ),
 ];
 
-
-// 난이도 중간 / 어려움도 똑같이 정의
+// 난이도 중간
 final List<FindWrongImageData> mediumImages = [
   FindWrongImageData(
     topImagePath: 'assets/findWrong/medium/top01.png',
@@ -63,6 +74,7 @@ final List<FindWrongImageData> mediumImages = [
       Offset(330, 78),
       Offset(385, 285),
     ],
+    originalSize: Size(393, 393),
   ),
   FindWrongImageData(
     topImagePath: 'assets/findWrong/medium/top02.png',
@@ -73,6 +85,7 @@ final List<FindWrongImageData> mediumImages = [
       Offset(345, 135),
       Offset(360, 340),
     ],
+    originalSize: Size(393, 393),
   ),
   FindWrongImageData(
     topImagePath: 'assets/findWrong/medium/top03.jpg',
@@ -83,11 +96,12 @@ final List<FindWrongImageData> mediumImages = [
       Offset(365, 113),
       Offset(348, 148),
     ],
+    originalSize: Size(393, 393),
   ),
 ];
 
+// 난이도 어려움
 final List<FindWrongImageData> hardImages = [
-  // 이후 어려움 난이도용 이미지 정보들 추가
   FindWrongImageData(
     topImagePath: 'assets/findWrong/hard/top01.jpg',
     bottomImagePath: 'assets/findWrong/hard/bottom01.jpg',
@@ -98,5 +112,6 @@ final List<FindWrongImageData> hardImages = [
       Offset(110, 310),
       Offset(40, 280),
     ],
+    originalSize: Size(393, 393),
   ),
 ];
