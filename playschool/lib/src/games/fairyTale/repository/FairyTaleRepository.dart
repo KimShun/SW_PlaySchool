@@ -14,7 +14,7 @@ class FairyTaleRepository {
 
   Future<FairyTaleResult> createFairyBook(String content, String userUID, XFile? img) async {
     // final uri = Uri.parse('$baseUrl/make/fairyBook'); // 서버 주소로 변경
-    final uri = Uri.parse("http://192.168.219.105:8001/make/fairyBook");
+    final uri = Uri.parse("http://10.20.107.22:8001/make/fairyBook");
 
     final request = http.MultipartRequest('POST', uri)
       ..fields['content_line'] = content

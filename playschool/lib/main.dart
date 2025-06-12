@@ -23,6 +23,7 @@ import 'package:playschool/src/games/dance/repository/DanceRepository.dart';
 import 'package:playschool/src/games/dance/repository/danceList.dart';
 import 'package:playschool/src/games/dance/selectDance.dart';
 import 'package:playschool/src/games/drawing/drawingGame.dart';
+import 'package:playschool/src/games/drawing/drawingResult.dart';
 import 'package:playschool/src/games/drawing/drawingdetail.dart';
 import 'package:playschool/src/games/fairyTale/completeFairyTale.dart';
 import 'package:playschool/src/games/fairyTale/cubit/fairyTaleCubit.dart';
@@ -153,6 +154,18 @@ final GoRouter _router = GoRouter(
         final name = state.extra != null ? (state.extra as Map)['name'] : '';
         final imagePath = state.extra != null ? (state.extra as Map)['imagePath'] : '';
         return DrawingDetailScreen(name: name, imagePath: imagePath);
+      },
+    ),
+    GoRoute(
+      path: '/drawingResult',
+      builder: (context, state) {
+        final extra = state.extra as Map?;
+        return DrawingResult(
+          similarityPercent: extra?['similarityPercent'] ?? 0.0,
+          userDrawingPath: extra?['userDrawingPath'] ?? '',
+          canvasWidth: extra?['canvasWidth'] ?? 0,
+          canvasHeight: extra?['canvasHeight'] ?? 0,
+        );
       },
     ),
     GoRoute(

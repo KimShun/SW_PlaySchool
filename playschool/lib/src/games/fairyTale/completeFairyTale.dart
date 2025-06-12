@@ -60,7 +60,7 @@ class CompleteFairyTaleScreen extends StatelessWidget {
                                 height: 70,
                               ),
                               const SizedBox(height: 5.0),
-                              Text("용과의 모험",
+                              Text(args["fairyTaleInfo"].fairyName,
                                 style: TextStyle(
                                     color: MAKE_TEXT_COLOR,
                                     fontWeight: FontWeight.bold,
@@ -212,7 +212,7 @@ class _CompleteHeaderScreen extends StatelessWidget {
                               child: ClipRRect(
                                 borderRadius: const BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20)),
                                 child: Image.network(
-                                  "http://192.168.219.105:8001/${fairyResults[index]["image"]!}",
+                                  "http://10.20.107.22:8001/${fairyResults[index]["image"]!}",
                                   fit: BoxFit.cover,
                                   width: double.infinity
                                 ),
